@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="主要有下面几个问题，怎样判断哪些对象可以被回收？怎样回收？方法区的常量和类怎样回收？，基本是深入理解Java虚拟机书中的内容。 怎样判断哪些是可回收的垃圾呢？两种方法：  引用计数法：每次引用对象都会在该对象的引用计数器上加一，引用失效时就减一，计数为0时就可被回收，但是这种方法可能出现循环引用，就是ab两个对象相互引用  可达性分析：通过GC roots对象为起点向下搜索，和被引用的对象间存在引">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java垃圾回收">
+<meta property="og:url" content="http://yoursite.com/2020/11/07/Java%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/index.html">
+<meta property="og:site_name" content="suTrue">
+<meta property="og:description" content="主要有下面几个问题，怎样判断哪些对象可以被回收？怎样回收？方法区的常量和类怎样回收？，基本是深入理解Java虚拟机书中的内容。 怎样判断哪些是可回收的垃圾呢？两种方法：  引用计数法：每次引用对象都会在该对象的引用计数器上加一，引用失效时就减一，计数为0时就可被回收，但是这种方法可能出现循环引用，就是ab两个对象相互引用  可达性分析：通过GC roots对象为起点向下搜索，和被引用的对象间存在引">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-11-07T11:40:59.000Z">
+<meta property="article:modified_time" content="2020-11-07T11:42:17.360Z">
+<meta property="article:author" content="小小KUN">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://yoursite.com/2020/11/07/Java%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Java垃圾回收 | suTrue</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">suTrue</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%8E%E6%A0%B7%E5%88%A4%E6%96%AD%E5%93%AA%E4%BA%9B%E6%98%AF%E5%8F%AF%E5%9B%9E%E6%94%B6%E7%9A%84%E5%9E%83%E5%9C%BE%E5%91%A2%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">怎样判断哪些是可回收的垃圾呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%8E%E6%A0%B7%E5%9B%9E%E6%94%B6%E5%91%A2%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">怎样回收呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E5%8C%BA%E7%9A%84%E5%B8%B8%E9%87%8F%E5%92%8C%E7%B1%BB"><span class="nav-number">3.</span> <span class="nav-text">方法区的常量和类</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">小小KUN</p>
+  <div class="site-description" itemprop="description">wake the fuck up</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/07/Java%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java垃圾回收
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2020-11-07 19:40:59 / 修改时间：19:42:17" itemprop="dateCreated datePublished" datetime="2020-11-07T19:40:59+08:00">2020-11-07</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>主要有下面几个问题，怎样判断哪些对象可以被回收？怎样回收？方法区的常量和类怎样回收？，基本是深入理解Java虚拟机书中的内容。</p>
+<h3 id="怎样判断哪些是可回收的垃圾呢？"><a href="#怎样判断哪些是可回收的垃圾呢？" class="headerlink" title="怎样判断哪些是可回收的垃圾呢？"></a>怎样判断哪些是可回收的垃圾呢？</h3><p>两种方法：</p>
+<ol>
+<li><p>引用计数法：每次引用对象都会在该对象的引用计数器上加一，引用失效时就减一，计数为0时就可被回收，但是这种方法可能出现循环引用，就是ab两个对象相互引用</p>
+</li>
+<li><p>可达性分析：通过GC roots对象为起点向下搜索，和被引用的对象间存在引用链，如果一个对象到GCroots没有任何引用链，就可被回收。GCroots对象一般包括：</p>
+<ol>
+<li>虚拟机栈中引用的对象</li>
+<li>方法区中类静态属性引用的对象</li>
+<li>方法区中常量引用的对象</li>
+<li>本地方法栈中JNI引用的对象</li>
+</ol>
+</li>
+</ol>
+<p>但是也不是说只要有引用存在就一定不会被回收，这种说法是针对强引用而言的。如果是软引用、弱引用、虚引用的对象，即使该对象还被引用着，也可能会被回收。</p>
+<a id="more"></a>
+
+<p>而且在垃圾回收的最后阶段会给这些对象第二次机会，在分析阶段会把可被回收的对象放入一个队列中，分析完成后会再次查看队列中的每个对象是否复活了（重新被引用），如果复活了就不再对其回收。</p>
+<h3 id="怎样回收呢？"><a href="#怎样回收呢？" class="headerlink" title="怎样回收呢？"></a>怎样回收呢？</h3><ol>
+<li><strong>回收算法：</strong><ol>
+<li>复制：将内存分为两块，每次只使用其中一块，当这块内存用完时就将还存活的对象复制到另一块内存上，再清理本块内存。很高效，没有内存碎片，但是缩小了内存使用空间。新生代回收器一般都采用这种算法，不过并不是平均分为两半，而是8:1分</li>
+<li>标记-清除：先标记出所有要被回收的对象，再统一清除标记的所有对象。不高效且有内存碎片</li>
+<li>标记-整理：先标记所有要被回收的对象，将所有存活的对象移到一端，再将端边界外的内存全部清理掉</li>
+<li>分代收集：就是将内存分为新生代和老年代</li>
+</ol>
+</li>
+</ol>
+<p>基本上是分代然后使用不同的垃圾回收器进行回收，垃圾回收器会使用不同的回收算法，有7种垃圾回收器：</p>
+<ul>
+<li>Serial：新，可与Serial Old和CMS一起用，单线程，复制算法</li>
+<li>ParNew：新，同上，多线程，复制算法</li>
+<li>Parallel Scavenge：新，能与Serial Old和Parallel Old搭配，多线程，复制算法。但是和ParNew的区别是它关注的主要是收集器的可控制的吞吐量，可以设置最大垃圾收集停顿时间或者设置吞吐量大小</li>
+<li>Serial Old：老，单线程，标记-整理算法</li>
+<li>Parallel Old：老，多线程，标记-整理算法，注重吞吐量</li>
+<li>CMS：老，多线程，标记-清理算法，优点是暂停时间短，但会有<strong>碎片问题和浮动垃圾以及降低吞吐量</strong>。分四个阶段：<ol>
+<li>初始标记：会短暂暂停工作线程，找到GCroots初始对象</li>
+<li>并发标记：从GCroots进行可达性分析</li>
+<li>重新标记：会短暂暂停工作线程，为了修正上一步并发标记阶段工作线程因为继续运行而导致的标记的变动</li>
+<li>并发清除：</li>
+</ol>
+</li>
+<li>G1：将堆内存分为很多大小相等的<strong>独立区域</strong>，有的区域属于新生代，有的属于老年代，G1会跟踪每个区域的<strong>回收价值</strong>（回收后获得的空间越大，耗时越小，价值就越大），通过一个优先队列先回收在允许的回收时间内价值最大的区域。<strong>优势是可预测的停顿时间，注重吞吐量和低延时，并且没有内存碎片</strong>。回收流程：（前三步和CMS的类似）<ol>
+<li>初始标记</li>
+<li>并发标记</li>
+<li>最终标记</li>
+<li>筛选回收：对各个region的回收价值和成本进行排序，根据用户期望的GC停顿时间来制定回收计划。在不同区域间通过复制算法进行回收</li>
+</ol>
+</li>
+</ul>
+<p>上面的是对堆中的垃圾进行回收，那么别的区域怎样回收呢？</p>
+<h3 id="方法区的常量和类"><a href="#方法区的常量和类" class="headerlink" title="方法区的常量和类"></a>方法区的常量和类</h3><ol>
+<li><p>常量回收和堆中的对象回收类似，看有无某个常量的引用，没有的话就从常量池中清除。</p>
+</li>
+<li><p>Class类的卸载，判断条件比较苛刻：</p>
+<ol>
+<li>该类所有的实例都已经被回收，也就是 Java 堆中不存在该类的任何实例。</li>
+<li>加载该类的 ClassLoader 已经被回收。</li>
+<li>该类对应的 <code>java.lang.Class</code> 对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法</li>
+</ol>
+<p><strong>由Java虚拟机自带的类加载器所加载的类，在虚拟机的生命周期中，始终不会被卸载。</strong>因为Java虚拟机自带的类加载器包括启动类加载器<strong>、</strong>扩展类加载器和应用程序类加载器。Java虚拟机本身会始终引用这些类加载器，而这些类加载器则会始终引用它们所加载的类的Class对象，因此这些Class对象始终是可触及的。</p>
+<p><strong>由用户自定义的类加载器加载的类是可以被卸载的</strong>。</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/07/17/redis/" rel="prev" title="redis基础">
+                  <i class="fa fa-chevron-left"></i> redis基础
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">小小KUN</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

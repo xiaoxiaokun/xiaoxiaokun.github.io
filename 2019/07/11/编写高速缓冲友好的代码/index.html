@@ -24,15 +24,15 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
   </script>
 
-  <meta name="description" content="做一点总结 高速缓存运行机制简单介绍一种层次存储结构，利用时间，空间局部性：  高速缓存通过 -直接映射高速缓存，-组相联高速缓存，-全相联高速缓存 三种方式在缓存中进行查找。 如果命中（hit）进行读或写包括write though，write back等方式进行后续处理。 若没命中（cache miss）有两种可能：冷不命中时执行放置策略，但是放置策略可能引起冲突不命中（即有空位但却不使用），">
+  <meta name="description" content="做一点总结 高速缓存运行机制简单介绍一种层次存储结构，利用时间，空间局部性：  高速缓存通过 -直接映射高速缓存，-组相联高速缓存，-全相联高速缓存 三种方式在缓存中进行查找。  如果命中（hit）进行读或写包括write though，write back等方式进行后续处理。  若没命中（cache miss）有两种可能：冷不命中时执行放置策略，但是放置策略可能引起冲突不命中（即有空位但却不使用">
 <meta property="og:type" content="article">
 <meta property="og:title" content="编写高速缓冲友好的代码">
 <meta property="og:url" content="http://yoursite.com/2019/07/11/%E7%BC%96%E5%86%99%E9%AB%98%E9%80%9F%E7%BC%93%E5%86%B2%E5%8F%8B%E5%A5%BD%E7%9A%84%E4%BB%A3%E7%A0%81/index.html">
 <meta property="og:site_name" content="suTrue">
-<meta property="og:description" content="做一点总结 高速缓存运行机制简单介绍一种层次存储结构，利用时间，空间局部性：  高速缓存通过 -直接映射高速缓存，-组相联高速缓存，-全相联高速缓存 三种方式在缓存中进行查找。 如果命中（hit）进行读或写包括write though，write back等方式进行后续处理。 若没命中（cache miss）有两种可能：冷不命中时执行放置策略，但是放置策略可能引起冲突不命中（即有空位但却不使用），">
+<meta property="og:description" content="做一点总结 高速缓存运行机制简单介绍一种层次存储结构，利用时间，空间局部性：  高速缓存通过 -直接映射高速缓存，-组相联高速缓存，-全相联高速缓存 三种方式在缓存中进行查找。  如果命中（hit）进行读或写包括write though，write back等方式进行后续处理。  若没命中（cache miss）有两种可能：冷不命中时执行放置策略，但是放置策略可能引起冲突不命中（即有空位但却不使用">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-07-11T12:07:00.000Z">
-<meta property="article:modified_time" content="2019-07-11T12:07:00.000Z">
+<meta property="article:modified_time" content="2020-11-07T11:12:47.021Z">
 <meta property="article:author" content="小小KUN">
 <meta name="twitter:card" content="summary">
 
@@ -164,7 +164,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-count">20</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -237,6 +237,13 @@
 
       <time title="创建时间：2019-07-11 20:07:00" itemprop="dateCreated datePublished" datetime="2019-07-11T20:07:00+08:00">2019-07-11</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-11-07 19:12:47" itemprop="dateModified" datetime="2020-11-07T19:12:47+08:00">2020-11-07</time>
+      </span>
 
   
 </div>
@@ -251,14 +258,19 @@
         <p>做一点总结</p>
 <h3 id="高速缓存运行机制简单介绍"><a href="#高速缓存运行机制简单介绍" class="headerlink" title="高速缓存运行机制简单介绍"></a>高速缓存运行机制简单介绍</h3><p>一种层次存储结构，利用时间，空间局部性：</p>
 <ol>
-<li>高速缓存通过 -直接映射高速缓存，-组相联高速缓存，-全相联高速缓存 三种方式在缓存中进行查找。</li>
-<li>如果命中（hit）进行读或写包括write though，write back等方式进行后续处理。</li>
-<li>若没命中（cache miss）有两种可能：冷不命中时执行放置策略，但是放置策略可能引起冲突不命中（即有空位但却不使用），不是空缓存的话会执行替换策略（有LRU，LFU，随机等方法）。同时有write allocate，not write allocate等方式进行后续处理。</li>
-<li>评价高速缓存性能有命中率，不命中率，命中时间，不命中惩罚。</li>
-<li>影响高速缓存性能的有 块的大小，相联度，写策略缓存大小等。</li>
-</ol>
-<a id="more"></a>
+<li><p>高速缓存通过 -直接映射高速缓存，-组相联高速缓存，-全相联高速缓存 三种方式在缓存中进行查找。</p>
+</li>
+<li><p>如果命中（hit）进行读或写包括write though，write back等方式进行后续处理。</p>
+</li>
+<li><p>若没命中（cache miss）有两种可能：冷不命中时执行放置策略，但是放置策略可能引起冲突不命中（即有空位但却不使用），不是空缓存的话会执行替换策略（有LRU，LFU，随机等方法）。同时有write allocate，not write allocate等方式进行后续处理。</p>
+</li>
+<li><p>评价高速缓存性能有命中率，不命中率，命中时间，不命中惩罚。</p>
+</li>
+<li><p>影响高速缓存性能的有 块的大小，相联度，写策略缓存大小等。</p>
+<a id="more"></a> 
 
+</li>
+</ol>
 <h3 id="基本方法"><a href="#基本方法" class="headerlink" title="基本方法"></a>基本方法</h3><ol>
 <li>关注核心函数的循环</li>
 <li>在每个循环最内部的缓存不命中数量最小</li>

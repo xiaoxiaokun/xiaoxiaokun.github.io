@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="今天无意中看到这个主题，功能强，界面又好看，好像有动力写博客了呢，就顺便把这两天的东西记一下，，， 编辑：通过七牛云配合qimage工具制作图床( https:&#x2F;&#x2F;jverson.com&#x2F;2017&#x2F;05&#x2F;28&#x2F;qiniu-image-v2&#x2F; )，保存的typora图片终于可以在别处显示啦 servletidea配置遇到的几个坑： 在project struct中设置class输出路径到WEB-IN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="接触jsp和servlet">
+<meta property="og:url" content="http://yoursite.com/2019/08/20/servlet%E5%92%8CJSP/index.html">
+<meta property="og:site_name" content="suTrue">
+<meta property="og:description" content="今天无意中看到这个主题，功能强，界面又好看，好像有动力写博客了呢，就顺便把这两天的东西记一下，，， 编辑：通过七牛云配合qimage工具制作图床( https:&#x2F;&#x2F;jverson.com&#x2F;2017&#x2F;05&#x2F;28&#x2F;qiniu-image-v2&#x2F; )，保存的typora图片终于可以在别处显示啦 servletidea配置遇到的几个坑： 在project struct中设置class输出路径到WEB-IN">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/20/mYmVoR.png">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/20/mYmmJx.png">
+<meta property="article:published_time" content="2019-08-20T11:22:30.000Z">
+<meta property="article:modified_time" content="2019-08-20T11:22:30.000Z">
+<meta property="article:author" content="小小KUN">
+<meta property="article:tag" content="配置">
+<meta property="article:tag" content="web">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.ax1x.com/2019/08/20/mYmVoR.png">
+
+
+<link rel="canonical" href="http://yoursite.com/2019/08/20/servlet%E5%92%8CJSP/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>接触jsp和servlet | suTrue</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">suTrue</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#servlet"><span class="nav-number">1.</span> <span class="nav-text">servlet</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#idea%E9%85%8D%E7%BD%AE%E9%81%87%E5%88%B0%E7%9A%84%E5%87%A0%E4%B8%AA%E5%9D%91%EF%BC%9A"><span class="nav-number">1.1.</span> <span class="nav-text">idea配置遇到的几个坑：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E6%B5%81%E7%A8%8B%EF%BC%9A"><span class="nav-number">1.2.</span> <span class="nav-text">运行流程：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%B7%B3%E8%BD%AC%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%B7%B3%E8%BD%AC%EF%BC%9A"><span class="nav-number">1.3.</span> <span class="nav-text">服务器跳转和客户端跳转：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSP"><span class="nav-number">2.</span> <span class="nav-text">JSP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#jsp%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">jsp执行过程：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B5%E9%9D%A2%E7%BB%84%E6%88%90%E5%85%83%E7%B4%A0"><span class="nav-number">2.2.</span> <span class="nav-text">页面组成元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%85%E5%90%AB"><span class="nav-number">2.3.</span> <span class="nav-text">包含</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cookie"><span class="nav-number">2.4.</span> <span class="nav-text">cookie</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E7%94%A8%E5%9F%9F"><span class="nav-number">2.5.</span> <span class="nav-text">作用域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JSTL"><span class="nav-number">2.6.</span> <span class="nav-text">JSTL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EL%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">2.7.</span> <span class="nav-text">EL表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JavaBean"><span class="nav-number">2.8.</span> <span class="nav-text">JavaBean</span></a></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">小小KUN</p>
+  <div class="site-description" itemprop="description">wake the fuck up</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/20/servlet%E5%92%8CJSP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          接触jsp和servlet
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-08-20 19:22:30" itemprop="dateCreated datePublished" datetime="2019-08-20T19:22:30+08:00">2019-08-20</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>今天无意中看到这个主题，功能强，界面又好看，好像有动力写博客了呢，就顺便把这两天的东西记一下，，，</p>
+<p>编辑：通过七牛云配合qimage工具制作图床( <a target="_blank" rel="noopener" href="https://jverson.com/2017/05/28/qiniu-image-v2/">https://jverson.com/2017/05/28/qiniu-image-v2/</a> )，保存的typora图片终于可以在别处显示啦</p>
+<h2 id="servlet"><a href="#servlet" class="headerlink" title="servlet"></a>servlet</h2><h3 id="idea配置遇到的几个坑："><a href="#idea配置遇到的几个坑：" class="headerlink" title="idea配置遇到的几个坑："></a>idea配置遇到的几个坑：</h3><ol>
+<li>在project struct中设置class输出路径到WEB-INF</li>
+<li>写好的Java文件要自己手动编译一下</li>
+<li>最惨的是把 WEB-INF 打成了 WEB_INF，找了半天错fxxx</li>
+</ol>
+<h3 id="运行流程："><a href="#运行流程：" class="headerlink" title="运行流程："></a>运行流程：</h3><p><img src="https://s2.ax1x.com/2019/08/20/mYmVoR.png" alt="mYmVoR.png"></p>
+<a id="more"></a>
+
+<h3 id="服务器跳转和客户端跳转："><a href="#服务器跳转和客户端跳转：" class="headerlink" title="服务器跳转和客户端跳转："></a>服务器跳转和客户端跳转：</h3><ul>
+<li>服务器：服务器自己找到要跳转的页面然后发送给游览器</li>
+<li>客户端：服务器发送跳转后的地址给客户端，然后客户端自己再访问跳转的地址</li>
+</ul>
+<h2 id="JSP"><a href="#JSP" class="headerlink" title="JSP"></a>JSP</h2><h3 id="jsp执行过程："><a href="#jsp执行过程：" class="headerlink" title="jsp执行过程："></a>jsp执行过程：</h3><p><img src="https://s2.ax1x.com/2019/08/20/mYmmJx.png" alt="mYmmJx.png"></p>
+<h3 id="页面组成元素"><a href="#页面组成元素" class="headerlink" title="页面组成元素"></a>页面组成元素</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1. 静态内容</span><br><span class="line">   就是html,css,javascript等内容</span><br><span class="line">2. 指令</span><br><span class="line">   以&lt;%@开始 %&gt; 结尾，比如&lt;%@page import&#x3D;&quot;java.util.*&quot;%&gt;</span><br><span class="line">3. 表达式 &lt;%&#x3D;%&gt;</span><br><span class="line">   用于输出一段html</span><br><span class="line">4. Scriptlet</span><br><span class="line">   在&lt;%%&gt; 之间，可以写任何java 代码</span><br><span class="line">5. 声明</span><br><span class="line">   在&lt;%!%&gt; 之间可以声明字段或者方法。但是不建议这么做。</span><br><span class="line">6. 动作</span><br><span class="line">   &lt;jsp:include page&#x3D;&quot;Filename&quot; &gt;，在jsp页面中包含另一个页面。</span><br><span class="line">7. 注释 &lt;%-- -- %&gt;</span><br><span class="line">   不同于html的注释 &lt;!-- --&gt; 通过jsp的注释，浏览器也看不到相应的代码，相当于在servlet中注释掉了</span><br></pre></td></tr></table></figure>
+
+<h3 id="包含"><a href="#包含" class="headerlink" title="包含"></a>包含</h3><figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;jsp:include page=<span class="string">&quot;footer.jsp&quot;</span> /&gt;    <span class="comment">//动作包含</span></span><br><span class="line">&lt;%<span class="meta">@include</span> file=<span class="string">&quot;footer.jsp&quot;</span> %&gt;     <span class="comment">//指令包含</span></span><br></pre></td></tr></table></figure>
+
+<p>指令是进行插入，只生成一个文件，动作包含生成两个文件。</p>
+<p>跳转分为客户端跳和服务器跳，和servlet类似。</p>
+<h3 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h3><ul>
+<li>Cookie是一种浏览器和服务器交互数据的方式。</li>
+<li>Cookie是由服务器端创建，但是<strong>不会保存在服务器</strong>。</li>
+<li>创建好之后，发送给浏览器。浏览器<strong>保存在用户本地</strong>。</li>
+<li>下一次访问网站的时候，就会把该Cookie发送给服务器。  </li>
+</ul>
+<h3 id="作用域"><a href="#作用域" class="headerlink" title="作用域"></a>作用域</h3><ul>
+<li><strong>pageContext</strong> 当前页面 </li>
+<li><strong>requestContext</strong> 一次请求：所以客户端跳转和服务器端跳转的情况不同</li>
+<li><strong>sessionContext</strong> 当前会话 ：从<strong>一个用户</strong>打开网站的那一刻起，无论访问了多少网页，链接都属于同一个会话，直到浏览器关闭。 </li>
+<li><strong>applicationContext</strong> 全局，所有用户共享</li>
+</ul>
+<h3 id="JSTL"><a href="#JSTL" class="headerlink" title="JSTL"></a>JSTL</h3><p>JSP标准标签库（JSTL）是一个JSP标签集合，它封装了JSP应用的通用核心功能。JSTL库有core, i18n, fmt, sql 等等。 </p>
+<p>在页面中使用JSTL需要在jsp中 通过指令进行设置:</p>
+<p><code>&lt;%@ taglib uri=&quot;http://java.sun.com/jsp/jstl/core&quot; prefix=&quot;c&quot;%&gt;</code></p>
+<ul>
+<li>prefix=”c” 表示后续的标签使用都会以**&lt;c:** 开头。如：</li>
+</ul>
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:set <span class="keyword">var</span>=<span class="string">&quot;name&quot;</span> value=<span class="string">&quot;$&#123;&#x27;gareen&#x27;&#125;&quot;</span> scope=<span class="string">&quot;request&quot;</span> /&gt;   <span class="comment">//设置name</span></span><br><span class="line">&lt;c:out value=<span class="string">&quot;$&#123;name&#125;&quot;</span> /&gt;   <span class="comment">//输出name</span></span><br><span class="line">&lt;c:remove <span class="keyword">var</span>=<span class="string">&quot;name&quot;</span> scope=<span class="string">&quot;request&quot;</span> /&gt;    <span class="comment">//在request作用域中移除name</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>  JSTL通过**&lt;c:if test=””&gt;** 进行条件判断，但是JSTL<strong>没有&lt;c:else</strong>，所以常用的办法是在&lt;c:if的条件里取反  -_-</li>
+<li><code>&lt;c:forEach items=&quot;$&#123;heros&#125;&quot; var=&quot;hero&quot; varStatus=&quot;st&quot;  &gt;</code>进行循环</li>
+<li><code>&lt;%@ taglib uri=&quot;http://java.sun.com/jsp/jstl/fmt&quot;  prefix=&#39;fmt&#39; %&gt;</code>进行格式化</li>
+</ul>
+<h3 id="EL表达式"><a href="#EL表达式" class="headerlink" title="EL表达式"></a>EL表达式</h3><p>比JSTL简化一些：</p>
+<p><code>&lt;c:out value = &quot;$&#123;name&#125;&quot;</code> 和 <code>$&#123;name&#125;</code>是等价的</p>
+<p>如果多个作用域中都有同一个属性，pageContext &gt; request &gt; session &gt; application 的优先顺序获取。</p>
+<h3 id="JavaBean"><a href="#JavaBean" class="headerlink" title="JavaBean"></a>JavaBean</h3><p>根本而言，bean只是遵循了特定编码规范的Java类而已</p>
+<ol>
+<li>提供无参public的构造方法(默认提供)</li>
+<li>每个属性，都有public的getter和setter</li>
+<li>如果属性是boolean,那么就对应is和setter方法</li>
+</ol>
+<p>获取JavaBean的属性，只需要通过 . 符号操作就可以了。像这样 ${hero.name} ，就会自动调用getName方法了 </p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%85%8D%E7%BD%AE/" rel="tag"># 配置</a>
+              <a href="/tags/web/" rel="tag"># web</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/08/20/Java%E9%9B%86%E5%90%88%EF%BC%88%E5%AE%B9%E5%99%A8%EF%BC%89/" rel="prev" title="Java集合的使用方法">
+                  <i class="fa fa-chevron-left"></i> Java集合的使用方法
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/08/20/Java%E4%B8%ADint%E5%92%8CInteger%E7%9A%84%E5%85%B3%E7%B3%BB%E6%98%AF%E4%BB%80%E4%B9%88/" rel="next" title="Java中int和Integer的关系是什么">
+                  Java中int和Integer的关系是什么 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">小小KUN</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="输入输出是在主存和外部设备（如硬盘，网络，终端）之间拷贝数据的过程，Unix将所有I&#x2F;O设备都抽象为文件，输入输出被当作对相应文件的读和写来执行。 文件什么是文件Unix文件是一个m个字节的序列，系统将一切I&#x2F;O设备（如硬件设备，终端，网络）都抽象为文件，再通过描述符（内核返回的非负整数）这个接口去操作，使所有设备的访问都是以文件的方式进行，优雅且统一。 文件的类型 普通文件 一般来说需要区分出文">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSAPP系统I&#x2F;O">
+<meta property="og:url" content="http://yoursite.com/2019/08/24/CSAPP%CF%B5%CD%B3IO/index.html">
+<meta property="og:site_name" content="suTrue">
+<meta property="og:description" content="输入输出是在主存和外部设备（如硬盘，网络，终端）之间拷贝数据的过程，Unix将所有I&#x2F;O设备都抽象为文件，输入输出被当作对相应文件的读和写来执行。 文件什么是文件Unix文件是一个m个字节的序列，系统将一切I&#x2F;O设备（如硬件设备，终端，网络）都抽象为文件，再通过描述符（内核返回的非负整数）这个接口去操作，使所有设备的访问都是以文件的方式进行，优雅且统一。 文件的类型 普通文件 一般来说需要区分出文">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/16/mVI96s.png">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/16/mVIn1J.png">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/16/mVIy4S.png">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/16/mVIb34.png">
+<meta property="article:published_time" content="2019-08-24T02:34:38.000Z">
+<meta property="article:modified_time" content="2019-08-24T02:34:38.000Z">
+<meta property="article:author" content="小小KUN">
+<meta property="article:tag" content="csapp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.ax1x.com/2019/08/16/mVI96s.png">
+
+
+<link rel="canonical" href="http://yoursite.com/2019/08/24/CSAPP%CF%B5%CD%B3IO/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CSAPP系统I/O | suTrue</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">suTrue</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%96%87%E4%BB%B6"><span class="nav-number">1.1.</span> <span class="nav-text">什么是文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.2.</span> <span class="nav-text">文件的类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E6%96%87%E4%BB%B6%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="nav-number">1.3.</span> <span class="nav-text">对文件的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%93%E5%BC%80%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.1.</span> <span class="nav-text">打开文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%B9%E5%8F%98%E6%96%87%E4%BB%B6%E5%BD%93%E5%89%8D%E4%BD%8D%E7%BD%AE"><span class="nav-number">1.3.2.</span> <span class="nav-text">改变文件当前位置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.3.</span> <span class="nav-text">读写文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E9%97%AD%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.4.</span> <span class="nav-text">关闭文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E6%96%87%E4%BB%B6%E5%92%8C%E9%87%8D%E5%AE%9A%E5%90%91"><span class="nav-number">1.3.5.</span> <span class="nav-text">共享文件和重定向</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I-O%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">I&#x2F;O函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Unix-IO"><span class="nav-number">2.1.</span> <span class="nav-text">Unix IO</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E5%87%86I-O"><span class="nav-number">2.2.</span> <span class="nav-text">标准I&#x2F;O</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RIO%EF%BC%88Robust%E5%81%A5%E5%A3%AE%E7%9A%84%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">RIO（Robust健壮的）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">小小KUN</p>
+  <div class="site-description" itemprop="description">wake the fuck up</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/24/CSAPP%CF%B5%CD%B3IO/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CSAPP系统I/O
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-08-24 10:34:38" itemprop="dateCreated datePublished" datetime="2019-08-24T10:34:38+08:00">2019-08-24</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>输入输出是在主存和外部设备（如硬盘，网络，终端）之间拷贝数据的过程，Unix将所有I/O设备都抽象为<strong>文件</strong>，输入输出被当作对相应文件的读和写来执行。</p>
+<h2 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h2><h3 id="什么是文件"><a href="#什么是文件" class="headerlink" title="什么是文件"></a>什么是文件</h3><p>Unix文件是一个m个字节的序列，系统将一切I/O设备（如硬件设备，终端，网络）都抽象为文件，再通过描述符（内核返回的非负整数）这个接口去操作，使所有设备的访问都是以文件的方式进行，优雅且统一。</p>
+<h3 id="文件的类型"><a href="#文件的类型" class="headerlink" title="文件的类型"></a>文件的类型</h3><ul>
+<li><p>普通文件</p>
+<p>一般来说需要区分出文本文件和二进制文件。文本文件只包含 ASCII 或 Unicode 字符。除此之外的都是二进制文件(对象文件, JPEG 图片, 等等)。对于内核来说其实并不能区分出个中的区别。文本文件就是一系列的文本行，每行以 <code>\n</code> 结尾，新的一行是 <code>0xa</code>，和 ASCII 码中的 line feed 字符(LF) 一样。不同系统用用判断一行结束的符号不同</p>
+</li>
+<li><p>目录</p>
+<p>目录文件包含其他文件的信息，目录包含一个链接(link)数组，并且每个目录至少包含两条记录：</p>
+<ul>
+<li><code>.</code>(dot) 当前目录</li>
+<li><code>..</code>(dot dot) 上一层目录</li>
+</ul>
+</li>
+<li><p>套接字</p>
+<p>一种通过网络与其他进程通信的文件</p>
+</li>
+</ul>
+<h3 id="对文件的操作"><a href="#对文件的操作" class="headerlink" title="对文件的操作"></a>对文件的操作</h3><a id="more"></a>
+
+<h4 id="打开文件"><a href="#打开文件" class="headerlink" title="打开文件"></a>打开文件</h4><p>应用程序通过内核打开相应文件，获得描述符。Linux shell创建的每个进程开始时都有三个打开的文件：标准输入（描述符为0），标准输出（1），标准错误（2）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//返回值是一个小的整型称为文件描述符(file descriptor)，如果这个值等于 -1 则说明发生了错误</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">open</span><span class="params">(<span class="keyword">char</span> *filename, <span class="keyword">int</span> flags, <span class="keyword">mode_t</span> mode)</span> </span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> fd</span>; <span class="comment">// 文件描述符 file descriptor</span></span><br><span class="line"><span class="keyword">if</span> ((fd = open(<span class="string">&quot;/etc/hosts&quot;</span>, O_RDONLY)) &lt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">    perror(<span class="string">&quot;open&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>flags参数指明了进程打算如何访问这个文件，mode参数制定了新文件的访问权限</p>
+<h4 id="改变文件当前位置"><a href="#改变文件当前位置" class="headerlink" title="改变文件当前位置"></a>改变文件当前位置</h4><p>对每个打开的文件，内核都保持一个<strong>文件位置k</strong>，初始为0，是从文件开头的字节偏移量，可通过seek显示的设置当前位置</p>
+<h4 id="读写文件"><a href="#读写文件" class="headerlink" title="读写文件"></a>读写文件</h4><p>就是字节在文件到存储器间的相互转移呗</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">read</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> n)</span></span>; <span class="comment">//成功返回读的字节数，若EOF则为0，出错为-1</span></span><br><span class="line"><span class="function"><span class="keyword">ssize_t</span> <span class="title">write</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">const</span> <span class="keyword">void</span> *buf, <span class="keyword">size_t</span> n)</span></span>;  <span class="comment">//若成功返回写的字节数，出错为-1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> buf[<span class="number">512</span>];</span><br><span class="line"><span class="keyword">int</span> fd;</span><br><span class="line"><span class="keyword">int</span> nbytes;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 打开文件描述符，并从中读取 512 字节的数据</span></span><br><span class="line"><span class="keyword">if</span> ((nbytes = read(fd, buf, <span class="keyword">sizeof</span>(buf))) &lt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">    perror(<span class="string">&quot;read&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 打开文件描述符，并向其写入 512 字节的数据</span></span><br><span class="line"><span class="keyword">if</span> ((nbytes = write(fd, buf, <span class="keyword">sizeof</span>(buf)) &lt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">    perror(<span class="string">&quot;write&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ssize_t 被定义为 int，size_t 被定义为 unsigned int</p>
+<p>其中读取文件的<strong>元数据</strong>（元数据是用来描述数据的数据，包含访问模式、大小和创建时间等，由内核维护）可以通过 <code>stat</code> 和 <code>fstat</code> 函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">stat</span><span class="params">(conse <span class="keyword">char</span> *filename, struct stat * buf)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fstat</span><span class="params">(<span class="keyword">int</span> fd, struct stat *buf)</span></span>;    <span class="comment">//若成功返回0，出错返回-1</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="关闭文件"><a href="#关闭文件" class="headerlink" title="关闭文件"></a>关闭文件</h4><p>内核释放文件打开时创建的数据结构，并将这个描述符恢复到可用的描述符池中。进程终止时就关闭该进程打开的所有文件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">close</span><span class="params">(<span class="keyword">int</span> fd)</span> <span class="comment">//成功则返回0，出错返回-1</span></span></span><br><span class="line"><span class="function">    </span></span><br><span class="line"><span class="function"><span class="keyword">int</span> fd</span>;     <span class="comment">// 文件描述符</span></span><br><span class="line"><span class="keyword">int</span> retval; <span class="comment">// 返回值</span></span><br><span class="line"><span class="keyword">int</span> ((retval = close(fd)) &lt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">    perror(<span class="string">&quot;close&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="共享文件和重定向"><a href="#共享文件和重定向" class="headerlink" title="共享文件和重定向"></a>共享文件和重定向</h4><p>内核用三个相关的数据结构来表示打开的文件：</p>
+<ul>
+<li>描述符表：每个独立的进程1张，表项由进程打开的文件描述符来索引，每个打开的表项指向一打开的文件表；</li>
+<li>文件表：包括打开文件位置，引用数量，以及一个指向元数据的v-node指针</li>
+<li>v-node表：包含stat结构的大部分信息；</li>
+</ul>
+<p><img src="https://s2.ax1x.com/2019/08/16/mVI96s.png" alt="mVI96s.png"></p>
+<p>使用 <code>fork</code>时子进程实际上是会继承父进程打开的文件的。在 fork 之后，子进程实际上和父进程的指向是一样的，会把引用计数加 1</p>
+<p><img src="https://s2.ax1x.com/2019/08/16/mVIn1J.png" alt="mVIn1J.png"></p>
+<p>了解了这个，我们我们就可以知道所谓的<strong>重定向</strong>（用于将磁盘文件和标准输入输出联系起来，并不是链接中的重定位）是怎么实现的了。其实很简单，只要调用 <code>dup2(oldfd, newfd)</code> 函数即可。我们只要改变文件描述符指向的文件，也就完成了重定向的过程，下图中我们把原来指向终端的文件描述符指向了磁盘文件，也就把终端上的输出保存在了文件中：</p>
+<p><img src="https://s2.ax1x.com/2019/08/16/mVIy4S.png" alt="mVIy4S.png"></p>
+<p>将新的fd加到老的fd上面，删除掉newfd以前的内容，如果newfd已打开还会被关闭。</p>
+<h2 id="I-O函数"><a href="#I-O函数" class="headerlink" title="I/O函数"></a>I/O函数</h2><p><img src="https://s2.ax1x.com/2019/08/16/mVIb34.png" alt="mVIb34.png"></p>
+<h3 id="Unix-IO"><a href="#Unix-IO" class="headerlink" title="Unix IO"></a>Unix IO</h3><p>在最底层，适用于读取文件元信息，其中的方法都是异步信号安全(async-signal-safe)的，也就是说，可以在信号处理器中调用，更适合于网络应用</p>
+<h3 id="标准I-O"><a href="#标准I-O" class="headerlink" title="标准I/O"></a>标准I/O</h3><p>C 标准库中包含一系列高层的标准 IO 函数，适用于在磁盘和终端中输入输出，标准 C I/O 中的函数都不是异步信号安全(async-signal-safe)的，所以并不能在信号处理器中使用。标准 C I/O 不适合用于处理网络套接字</p>
+<h3 id="RIO（Robust健壮的）"><a href="#RIO（Robust健壮的）" class="headerlink" title="RIO（Robust健壮的）"></a>RIO（Robust健壮的）</h3><p>是课程中提供的包，是对标准的封装，带有缓冲的read 和 write。它采用的解决办法就是利用 <code>read</code> 函数一次读取一块数据，然后再由高层的接口，一次从缓冲区读取一个字符（当缓冲区用完的时候需要重新填充）</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>Unix提供少量的系统级函数来为应用程序提供读，写，打开，关闭文件的功能，但它的读写操作会出现不足值，使用一般我们使用封装过的包来应对这种情况。</p>
+<p>Unix内核使用三个相关的数据结构来表示打开的文件，描述符表，打开文件表，v-node表，他们间的关系可以使我们搞清文件的共享和I/O重定向。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://wdxtub.com/csapp/thin-csapp-6/2016/04/16/">https://wdxtub.com/csapp/thin-csapp-6/2016/04/16/</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/6ec9e9af0da6">https://www.jianshu.com/p/6ec9e9af0da6</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/csapp/" rel="tag"># csapp</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/08/24/CSAPP%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/" rel="prev" title="CSAPP虚拟存储器">
+                  <i class="fa fa-chevron-left"></i> CSAPP虚拟存储器
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/09/12/CSAPP%20blocking/" rel="next" title="cache lab 和分块（blocking)">
+                  cache lab 和分块（blocking) <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">小小KUN</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

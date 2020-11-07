@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="什么是虚拟存储器一种对主存的抽象概念，为每个进程提供一个更大的，一致的和私有的地址空间。 物理内存 + 磁盘 &#x3D; 虚拟内存 一些概念什么是物理地址，虚拟地址 物理地址单指主存中的地址，系统将主存看作是一个非常大由M个连续字节大小的单元组成的数组，每个字节都有一个唯一的物理地址，第一个字节的地址为0，下面一个是1，以此类推 同理在虚拟存储器中的数组元素的地址就是虚拟地址  什么是物理寻址，虚拟寻址">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSAPP虚拟存储器">
+<meta property="og:url" content="http://yoursite.com/2019/08/24/CSAPP%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/index.html">
+<meta property="og:site_name" content="suTrue">
+<meta property="og:description" content="什么是虚拟存储器一种对主存的抽象概念，为每个进程提供一个更大的，一致的和私有的地址空间。 物理内存 + 磁盘 &#x3D; 虚拟内存 一些概念什么是物理地址，虚拟地址 物理地址单指主存中的地址，系统将主存看作是一个非常大由M个连续字节大小的单元组成的数组，每个字节都有一个唯一的物理地址，第一个字节的地址为0，下面一个是1，以此类推 同理在虚拟存储器中的数组元素的地址就是虚拟地址  什么是物理寻址，虚拟寻址">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/18/mQdw9A.png">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/18/mQd7HU.png">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/23/mB9cgf.png">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/23/mB9LKU.png">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/23/mBCPxK.png">
+<meta property="og:image" content="https://s2.ax1x.com/2019/08/23/mBCkrD.png">
+<meta property="article:published_time" content="2019-08-24T02:34:26.000Z">
+<meta property="article:modified_time" content="2019-08-24T02:34:26.000Z">
+<meta property="article:author" content="小小KUN">
+<meta property="article:tag" content="csapp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.ax1x.com/2019/08/18/mQdw9A.png">
+
+
+<link rel="canonical" href="http://yoursite.com/2019/08/24/CSAPP%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CSAPP虚拟存储器 | suTrue</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">suTrue</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">什么是虚拟存储器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">一些概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E7%89%A9%E7%90%86%E5%9C%B0%E5%9D%80%EF%BC%8C%E8%99%9A%E6%8B%9F%E5%9C%B0%E5%9D%80"><span class="nav-number">1.1.1.</span> <span class="nav-text">什么是物理地址，虚拟地址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E7%89%A9%E7%90%86%E5%AF%BB%E5%9D%80%EF%BC%8C%E8%99%9A%E6%8B%9F%E5%AF%BB%E5%9D%80"><span class="nav-number">1.1.2.</span> <span class="nav-text">什么是物理寻址，虚拟寻址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4"><span class="nav-number">1.1.3.</span> <span class="nav-text">什么是地址空间</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VM%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">VM实现的原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VM%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">1.3.</span> <span class="nav-text">VM的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%B0%E5%9D%80%E7%BF%BB%E8%AF%91"><span class="nav-number">1.4.</span> <span class="nav-text">地址翻译</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BF%BB%E8%AF%91%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="nav-number">1.4.1.</span> <span class="nav-text">翻译的过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%92%8Ccache%E7%BB%93%E5%90%88"><span class="nav-number">1.4.2.</span> <span class="nav-text">和cache结合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A9%E7%94%A8TLB%E5%8A%A0%E9%80%9F%E5%9C%B0%E5%9D%80%E7%BF%BB%E8%AF%91"><span class="nav-number">1.4.3.</span> <span class="nav-text">利用TLB加速地址翻译</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9A%E7%BA%A7%E9%A1%B5%E8%A1%A8"><span class="nav-number">1.4.4.</span> <span class="nav-text">多级页表</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E6%98%A0%E5%B0%84"><span class="nav-number">2.</span> <span class="nav-text">存储器映射</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%AD%98%E5%82%A8%E5%99%A8%E6%98%A0%E5%B0%84"><span class="nav-number">2.1.</span> <span class="nav-text">什么是存储器映射</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E5%99%A8%E5%88%86%E9%85%8D"><span class="nav-number">3.</span> <span class="nav-text">动态存储器分配</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">3.1.</span> <span class="nav-text">是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E9%85%8D%E5%99%A8%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.2.</span> <span class="nav-text">分配器的类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#malloc%E5%92%8Cfree%E5%87%BD%E6%95%B0"><span class="nav-number">3.2.1.</span> <span class="nav-text">malloc和free函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A2%8E%E7%89%87"><span class="nav-number">3.3.</span> <span class="nav-text">碎片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.4.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9A%90%E5%BC%8F%E7%A9%BA%E9%97%B2%E9%93%BE%E8%A1%A8"><span class="nav-number">3.4.1.</span> <span class="nav-text">隐式空闲链表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%98%BE%E5%BC%8F%E7%A9%BA%E9%97%B2%E9%93%BE%E8%A1%A8"><span class="nav-number">3.4.2.</span> <span class="nav-text">显式空闲链表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E7%A6%BB%E7%9A%84%E7%A9%BA%E9%97%B2%E9%93%BE%E8%A1%A8"><span class="nav-number">3.4.3.</span> <span class="nav-text">分离的空闲链表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86"><span class="nav-number">3.4.4.</span> <span class="nav-text">垃圾收集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#C%E7%A8%8B%E5%BA%8F%E7%9A%8410%E4%B8%AA%E5%B8%B8%E8%A7%81%E7%9A%84%E9%94%99%E8%AF%AF"><span class="nav-number">3.4.5.</span> <span class="nav-text">C程序的10个常见的错误</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">小小KUN</p>
+  <div class="site-description" itemprop="description">wake the fuck up</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/24/CSAPP%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CSAPP虚拟存储器
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-08-24 10:34:26" itemprop="dateCreated datePublished" datetime="2019-08-24T10:34:26+08:00">2019-08-24</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="什么是虚拟存储器"><a href="#什么是虚拟存储器" class="headerlink" title="什么是虚拟存储器"></a>什么是虚拟存储器</h2><p>一种对主存的抽象概念，为每个进程提供一个<strong>更大的</strong>，一致的和私有的地址空间。</p>
+<p>物理内存 + 磁盘 = 虚拟内存</p>
+<h3 id="一些概念"><a href="#一些概念" class="headerlink" title="一些概念"></a>一些概念</h3><h4 id="什么是物理地址，虚拟地址"><a href="#什么是物理地址，虚拟地址" class="headerlink" title="什么是物理地址，虚拟地址"></a>什么是物理地址，虚拟地址</h4><ul>
+<li>物理地址单指主存中的地址，系统将主存看作是一个非常大由M个连续字节大小的单元组成的数组，每个字节都有一个唯一的物理地址，第一个字节的地址为0，下面一个是1，以此类推</li>
+<li>同理在虚拟存储器中的数组元素的地址就是虚拟地址</li>
+</ul>
+<h4 id="什么是物理寻址，虚拟寻址"><a href="#什么是物理寻址，虚拟寻址" class="headerlink" title="什么是物理寻址，虚拟寻址"></a>什么是物理寻址，虚拟寻址</h4><ul>
+<li>CPU使用物理地址访问主存的方式就叫做物理寻址</li>
+<li>同理使用虚拟地址访问主存的方式叫做虚拟寻址，CPU通过生成一个虚拟地址来访问主存，这个虚拟地址在被送到存储器前先转换为适当的物理地址</li>
+</ul>
+<h4 id="什么是地址空间"><a href="#什么是地址空间" class="headerlink" title="什么是地址空间"></a>什么是地址空间</h4><p>是一个非负整数地址的有序集合，如果整数是连续的，就是一个线性地址空间</p>
+<ul>
+<li>虚拟地址空间：<ul>
+<li>有2的n次方个地址的地址空间，n是电脑位数决定的，比如32位，64位</li>
+<li>位数是<strong>数据总线的宽度，是指一次能传输的数据的位数，通常就是CPU一次能处理的数据的位数，所以字长就是取决于数据总线</strong></li>
+<li>所以虚拟存储器的大小是不一定的，同时有上限的，我们可以设置的非常大，但是访问不到也就没有用了</li>
+</ul>
+</li>
+<li>物理地址空间：与系统中物理存储器的M个字节相对应</li>
+</ul>
+<a id="more"></a>
+
+<h3 id="VM实现的原理"><a href="#VM实现的原理" class="headerlink" title="VM实现的原理"></a>VM实现的原理</h3><ul>
+<li>装载程序时：只将当前指令执行需要的部分页面放入内存中</li>
+<li>执行需要的指令或数据不在内存中时：处理器通知操作系统将相应的页面调入内存</li>
+<li>OS用页面调度算法将内存中暂时不用的页面保存到外存中</li>
+</ul>
+<p>实现的依据是局部性</p>
+<h3 id="VM的作用"><a href="#VM的作用" class="headerlink" title="VM的作用"></a>VM的作用</h3><ul>
+<li><p>作为缓存的工具</p>
+<p>DRAM用于磁盘和SRAM间的缓存，而VM可以用于磁盘和DRAM间的缓存。</p>
+<p>这个缓存是通过虚拟地址空间来实现的，这个空间不是真实存在的，它是假的，将这个空间划分为大小固定的块，称为虚拟页，再用一张表来记录这些块的使用情况叫做<strong>页表</strong>，这个表存放在内存中，每次需要使用某个虚拟页时先查找这个表中的条目（页表条目PTE）：</p>
+<ul>
+<li>命中：当存在于内存中时，就通过表中地址直接查到在内存中的物理地址，需要使用<strong>地址翻译</strong>，同时可以利用TLB加速这个翻译过程，下文会介绍</li>
+<li>不命中：不存在于内存中时，触发缺页异常，通过表中地址查找该页面在磁盘中的地址，再换入到内存中</li>
+</ul>
+</li>
+<li><p>作为存储器管理的工具</p>
+<p>管理DRAM，实际上每个进程有<strong>独立的</strong>页表，也就是单独的虚拟地址空间，再通过各自独立的虚拟地址空间映射到共同的<strong>物理地址空间</strong>（在DRAM中）和<strong>磁盘地址</strong>中，简化了链接，加载，共享和存储器分配这些过程。</p>
+</li>
+<li><p>作为储存器保护的工具</p>
+<p>在PTE添加一些许可位来控制对虚拟页面的访问，比如SUP，READ，WRITE位。</p>
+</li>
+</ul>
+<h3 id="地址翻译"><a href="#地址翻译" class="headerlink" title="地址翻译"></a>地址翻译</h3><h4 id="翻译的过程"><a href="#翻译的过程" class="headerlink" title="翻译的过程"></a>翻译的过程</h4><p>是建立一个<strong>虚拟地址空间</strong>到<strong>物理地址空间</strong>的映射关系</p>
+<p>需要使用一个叫做存储器管理单元MMU的专用硬件</p>
+<p>CPU中有一个专门的页表基址寄存器（PTBR）指向当前页表，当CPU生成一个虚拟地址并传递给MMU开始翻译的时候，MMU利用虚拟地址的VPN来选择相应的PTE，同时将该页表中对应的物理页号（PPN）+ 虚拟地址的VPO就生成了相应的物理地址。</p>
+<p><img src="https://s2.ax1x.com/2019/08/18/mQdw9A.png" alt="mQdw9A.png"></p>
+<p>当页面没命中时：</p>
+<p><img src="https://s2.ax1x.com/2019/08/18/mQd7HU.png" alt="mQd7HU.png"></p>
+<blockquote>
+<p>缺页步骤：①CPU生成虚拟地址；②MMU生成PTE地址从内存的页表中请求内容；③ 内存中的页表返回相应的PTE值；④ PTE的有效位是0，转到异常处理程序；⑤ 异常处理程序确定内存中的牺牲页，并将其写会到磁盘上（pagefile.sys）；⑥从pagefile.sys中调入新的文件并更新PTE。⑦ 由于PTE已经被更新好了，从新发送虚拟地址到MMU（后面就和命中的过程一样了）</p>
+</blockquote>
+<h4 id="和cache结合"><a href="#和cache结合" class="headerlink" title="和cache结合"></a>和cache结合</h4><p>大多数系统使用物理寻址来访问SRAM高速缓存，理由是cache无需处理保护问题，同时多进程同时在cache有存储块和共享来自相同虚拟页面的块很简单？？？</p>
+<p>地址翻译发生在高速缓存查找之前，不是很懂</p>
+<h4 id="利用TLB加速地址翻译"><a href="#利用TLB加速地址翻译" class="headerlink" title="利用TLB加速地址翻译"></a>利用TLB加速地址翻译</h4><p>产生的原因：本来页表是放在内存中的，我们知道DRAM是比SRAM慢将近10倍的，每次需要先在内存中查到物理地址，再到内存中这个位置找到想要的数据就需要访问内存两次，就让追求极限速度的人们感到不爽。</p>
+<p>TLB是什么：</p>
+<ul>
+<li>（翻译后备缓冲器）一个小的，虚拟寻址的缓存，每行都保存由单个PTE组成的块</li>
+<li>是一个在L1上的片上高速缓存，大多数页表条目位于其中，称为快表</li>
+<li>这样翻译时只需访问一次SRAM和一次DRAM，就快了很多</li>
+<li>快表只是页表的一个子集</li>
+</ul>
+<h4 id="多级页表"><a href="#多级页表" class="headerlink" title="多级页表"></a>多级页表</h4><p>为什么需要：如果只用一张页表来进行地址翻译的话，想要能翻译所以的物理地址空间会需要较大的页表驻留在内存中，想要表示4GB的内存地址空间需要4MB的表。假设固定页表大小为4KB，那么二级页表就可以表示4MB的内存空间了，三级页表可以表示4GB的内存空间，而在内存中我们只用常驻一个4KB的表即可。</p>
+<p>怎样做：采用层次结构的页表，一级页表中每个PTE映射虚拟地址空间中的一个二级表，二级表在映射三级表，以此类推。从两个方面减少了对存储器的要求：</p>
+<ul>
+<li>如果一级页表中某个PTE为空，那么其对应的二级表就根本不会存在</li>
+<li>只有一级表需要常驻于内存中，VM系统可以在需要时创建，页面调入/调出二级页表</li>
+</ul>
+<h2 id="存储器映射"><a href="#存储器映射" class="headerlink" title="存储器映射"></a>存储器映射</h2><h3 id="什么是存储器映射"><a href="#什么是存储器映射" class="headerlink" title="什么是存储器映射"></a>什么是存储器映射</h3><p>是<strong>虚拟存储器区域</strong>与一个<strong>磁盘上对象</strong>的关联过程</p>
+<p>虚拟存储区域映射到两种类型的对象：</p>
+<ul>
+<li>Unix文件系统中的普通文件</li>
+<li>匿名文件</li>
+</ul>
+<p>一个虚拟页面一旦被初始化了，就在内核维护专门的交换文件中换来换去。交换文件也叫做交换空间，交换区域。</p>
+<p>存储器映射对共享对象非常有帮助。一个对象可以被映射到虚拟存储器的一个区域，要么作为共享对象，要么作为私有对象。映射到共享对象的区域叫做共享区域，同理有私有区域：</p>
+<ul>
+<li>一个进程对共享区域的写操作对于也把该共享对象映射到它们虚拟存储器的其他进程而言也是可见的，同时变化会反映在磁盘的原始对象中</li>
+<li>但是对一个映射到私有对象的区域进行改变时，对其他进程是不可见的，并且进程对该区域的任何写操作都不会反映在磁盘的对象中。私有对象使用写时拷贝（COW），当一个进程试图写私有区域的某个页面时，会触发一个保护故障。在物理存储器中创建该页面的拷贝，更新页面条目指向该拷贝，同时再使该拷贝页面可写，最后再在这个新页面进行写操作。</li>
+</ul>
+<h2 id="动态存储器分配"><a href="#动态存储器分配" class="headerlink" title="动态存储器分配"></a>动态存储器分配</h2><h3 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h3><ul>
+<li>更方便的创建和删除虚拟存储区域</li>
+<li>在程序运行的时候分配额外的存储空间</li>
+<li>维护着一个进程的虚拟存储区域，称为堆</li>
+<li>分配器将堆视为一组不同大小的块的集合</li>
+</ul>
+<h3 id="分配器的类型"><a href="#分配器的类型" class="headerlink" title="分配器的类型"></a>分配器的类型</h3><p>显示分配器：显示的创建和释放块。C标准库提供了一个称为malloc程序包的显示分配器</p>
+<p>隐式分配器：也叫<strong>垃圾收集器</strong>，显示的创建，但是会自动检测不再使用的块并自动释放</p>
+<h4 id="malloc和free函数"><a href="#malloc和free函数" class="headerlink" title="malloc和free函数"></a>malloc和free函数</h4><p>malloc遇到问题会返回NULL</p>
+<p>如果想要初始化存储器为0，可以使用calloc函数，它是基于malloc的瘦包装函数。</p>
+<p>想要改变已分配的大小可以使用realloc函数</p>
+<h3 id="碎片"><a href="#碎片" class="headerlink" title="碎片"></a>碎片</h3><p>内部碎片：当已分配块比有效载荷大时，比如堆中头部和脚部所占的空间，还有因为对齐造成的浪费</p>
+<p>外部碎片：当空闲存储器合计起来满足一个分配请求，但是没有一个单独的空闲块足够大可以来处理这个请求。就是空闲块不连续造成的</p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><h4 id="隐式空闲链表"><a href="#隐式空闲链表" class="headerlink" title="隐式空闲链表"></a>隐式空闲链表</h4><p>是什么：</p>
+<ul>
+<li>是一种组织堆的结构，块的结构是：头部，有效载荷，填充（可选）；同时通过块头部的最低位来指明该块是已分配还是空闲的</li>
+<li>空闲块通过头部的大小字段隐含地链接</li>
+<li>有一个特殊标记的结束块</li>
+</ul>
+<p>分配器通过遍历堆中所有块便利空闲块的集合。</p>
+<p>放置策略：</p>
+<ul>
+<li>首次适配</li>
+<li>下一次适配：指每次从上一次查询<strong>结束的地方</strong>继续查询</li>
+<li>最佳适配</li>
+</ul>
+<p>操作：</p>
+<ul>
+<li>分割空闲块</li>
+<li>合并空闲块：在每个块的结尾处添加一个脚部，是头部的副本</li>
+<li>申请额外的堆存储器</li>
+</ul>
+<h4 id="显式空闲链表"><a href="#显式空闲链表" class="headerlink" title="显式空闲链表"></a>显式空闲链表</h4><p>来由：在隐式空闲链表中，块分配与堆块的总数是线性关系，所以一般不适用</p>
+<p>是什么：</p>
+<ul>
+<li>堆组织成一个双向空闲链表，每个空闲块都含一个前驱和后继指针</li>
+<li>首次适配时间从块总数线性时间减到了空闲块数量的线性时间</li>
+<li>释放块可选择 后进先出（新释放的块放在链表的开始处） 或者 按地址顺序（表中每个块地址都小于它后继的地址） 两种方法</li>
+</ul>
+<h4 id="分离的空闲链表"><a href="#分离的空闲链表" class="headerlink" title="分离的空闲链表"></a>分离的空闲链表</h4><p>来由：单向表的分配时间呈线性，为了减少分配的时间</p>
+<p>是什么：</p>
+<ul>
+<li>一个分离存储的系统</li>
+<li>维护多个空闲链表，每个链表中块的大小大致相同</li>
+<li>将所有块按大小分成一些大小不同的类（根据2的幂来划分），每个大小类一个空闲链表，按升序排列</li>
+<li>每次查找空闲块时，从前往后依次寻找</li>
+</ul>
+<p>分离存储方法有许多种，其中有两种：</p>
+<ul>
+<li>简单分离存储：每个空闲链中都是大小相等的块，不分割，不合并。所有分配和释放都很快，但是容易造成内部和外部碎片。</li>
+<li>分离适配：每个空闲链表被组织成某种类型的显式或隐式链表，每个链表包含潜在的大小不同的块。像单向链表一样可以分割，合并。但是搜索被限制在堆的某个部分而不是整个堆，所以搜索更快了。</li>
+<li>伙伴系统：是分离适配的一个<strong>特例</strong>。将每次请求块大小向上舍入到2的幂，使用起来更加快速，缺点是会导致显著的内部碎片，适合于特定应用的工作负载（块大小预先知道是2的幂）。</li>
+</ul>
+<h4 id="垃圾收集"><a href="#垃圾收集" class="headerlink" title="垃圾收集"></a>垃圾收集</h4><p>是什么：一种动态存储分配器，定期识别垃圾块，并相应调用free，将这些块放回到空闲链表中。</p>
+<p>工作原理：</p>
+<ul>
+<li>GC将存储器视为一张有向可达图，其中的节点分为根节点和堆节点</li>
+<li>每个堆节点对应于堆中一个已分配块，根节点对应于一种不在堆中的位置</li>
+<li>a节点指向b意味着a中的某个位置指向块b中的某个位置</li>
+<li>任意根节点出发到达堆中p节点，则可称p是可达的。不可达节点就是垃圾，就是没有任何指针指向的地方，需要释放并返回给空闲链表。</li>
+</ul>
+<p><img src="https://s2.ax1x.com/2019/08/23/mB9cgf.png" alt="mB9cgf.png"></p>
+<p>不是所有的垃圾回收器都很精确，C/C++的就不能准确识别不可达块，称为<strong>保守的垃圾回收器</strong></p>
+<p><strong>Mark&amp;Sweep垃圾收集器：</strong></p>
+<p>分为标记 和 清除 两个阶段：</p>
+<ul>
+<li>标记阶段标记处根节点的所有可达的和已分配的后继</li>
+<li>清除阶段释放每个未被标记的已分配块</li>
+</ul>
+<p><img src="https://s2.ax1x.com/2019/08/23/mB9LKU.png" alt="mB9LKU.png"></p>
+<p><img src="https://s2.ax1x.com/2019/08/23/mBCPxK.png" alt="mBCPxK.png"></p>
+<p><img src="https://s2.ax1x.com/2019/08/23/mBCkrD.png" alt="mBCkrD.png"></p>
+<ul>
+<li>箭头表示存储器的引用，而不是空闲链表指针</li>
+<li>淡蓝色的块是已分配的头部</li>
+<li>块1、3、4、6是可达的，所以都被标记了。2和5无法标记是垃圾</li>
+</ul>
+<h4 id="C程序的10个常见的错误"><a href="#C程序的10个常见的错误" class="headerlink" title="C程序的10个常见的错误"></a>C程序的10个常见的错误</h4><p>p582</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>VM是个超重要的概念，它的出现简化了计算机的许多部分的设计，在VM的作用中可以看到。了解它的原理可以更好的理解系统的工作原理。使用VM也是危险的，因为涉及到动态存储分配，垃圾的回收。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/e1b82b230917">https://www.jianshu.com/p/e1b82b230917</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/csapp/" rel="tag"># csapp</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/08/20/CSAPP%E5%BC%82%E5%B8%B8%E6%8E%A7%E5%88%B6%E6%B5%81/" rel="prev" title="异常控制流">
+                  <i class="fa fa-chevron-left"></i> 异常控制流
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/08/24/CSAPP%CF%B5%CD%B3IO/" rel="next" title="CSAPP系统I/O">
+                  CSAPP系统I/O <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">小小KUN</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

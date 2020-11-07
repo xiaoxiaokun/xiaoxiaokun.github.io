@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="客户端-服务器编程模型每个网络应用都是基于客户端-服务器模型的，服务器管理某种资源，客户端向其请求，服务器处理请求，再发送响应，客户端再处理响应。这就是一个事务（模型中的基本操作）。 对一个主机而言，网络只是一种I&#x2F;O设备。客户端和服务器通过在连接上发送和接受字节流来通信，这些字节流使用套接字接口函数和Unix I&#x2F;O函数进行处理。 一个套接字是连接的一个端点，每个套接字都有相应的套接字地址，由一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSAPP网络编程">
+<meta property="og:url" content="http://yoursite.com/2019/09/21/CSAPP%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:site_name" content="suTrue">
+<meta property="og:description" content="客户端-服务器编程模型每个网络应用都是基于客户端-服务器模型的，服务器管理某种资源，客户端向其请求，服务器处理请求，再发送响应，客户端再处理响应。这就是一个事务（模型中的基本操作）。 对一个主机而言，网络只是一种I&#x2F;O设备。客户端和服务器通过在连接上发送和接受字节流来通信，这些字节流使用套接字接口函数和Unix I&#x2F;O函数进行处理。 一个套接字是连接的一个端点，每个套接字都有相应的套接字地址，由一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.ax1x.com/2019/09/17/nIYkQS.png">
+<meta property="article:published_time" content="2019-09-21T03:32:24.000Z">
+<meta property="article:modified_time" content="2019-09-21T03:32:24.000Z">
+<meta property="article:author" content="小小KUN">
+<meta property="article:tag" content="csapp">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.ax1x.com/2019/09/17/nIYkQS.png">
+
+
+<link rel="canonical" href="http://yoursite.com/2019/09/21/CSAPP%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CSAPP网络编程 | suTrue</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">suTrue</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.</span> <span class="nav-text">客户端-服务器编程模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A5%97%E6%8E%A5%E5%AD%97%E6%8E%A5%E5%8F%A3"><span class="nav-number">2.</span> <span class="nav-text">套接字接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Web%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">Web服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#web%E5%9F%BA%E7%A1%80"><span class="nav-number">3.1.</span> <span class="nav-text">web基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP%E4%BA%8B%E5%8A%A1"><span class="nav-number">3.2.</span> <span class="nav-text">HTTP事务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP%E8%AF%B7%E6%B1%82"><span class="nav-number">3.2.1.</span> <span class="nav-text">HTTP请求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP%E5%93%8D%E5%BA%94"><span class="nav-number">3.2.2.</span> <span class="nav-text">HTTP响应</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%8A%A8%E6%80%81%E5%86%85%E5%AE%B9%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.3.</span> <span class="nav-text">服务动态内容的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="nav-number">3.4.</span> <span class="nav-text">工作流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tiny-Web-Server"><span class="nav-number">4.</span> <span class="nav-text">Tiny Web Server</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#main%E5%87%BD%E6%95%B0"><span class="nav-number">4.1.</span> <span class="nav-text">main函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#doit-%E5%87%BD%E6%95%B0"><span class="nav-number">4.2.</span> <span class="nav-text">doit 函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">小小KUN</p>
+  <div class="site-description" itemprop="description">wake the fuck up</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/21/CSAPP%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CSAPP网络编程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-09-21 11:32:24" itemprop="dateCreated datePublished" datetime="2019-09-21T11:32:24+08:00">2019-09-21</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="客户端-服务器编程模型"><a href="#客户端-服务器编程模型" class="headerlink" title="客户端-服务器编程模型"></a>客户端-服务器编程模型</h2><p>每个网络应用都是基于客户端-服务器模型的，服务器管理某种资源，客户端向其请求，服务器处理请求，再发送响应，客户端再处理响应。这就是一个<strong>事务</strong>（模型中的基本操作）。</p>
+<p>对一个主机而言，网络只是一种<strong>I/O设备</strong>。客户端和服务器通过在连接上发送和接受字节流来通信，这些字节流使用<strong>套接字接口函数和Unix I/O函数</strong>进行处理。</p>
+<p>一个套接字是连接的一个<strong>端点</strong>，每个套接字都有相应的<strong>套接字地址</strong>，由一个因特网地址和一个16位的整数端口组成。客户端中的地址的端口是由内核自动分配的，称为临时端口。服务器中的通常是某个知名的端口。</p>
+<p>一个连接是由它两端的套接字地址唯一确定的，这对套接字地址叫做<strong>套接字对</strong>（socket pair），表示为（cliaddr: cliport, servaddr: servport）</p>
+<p>IP地址结构是一个32位无符号整数，放在所谓的IP地址结构中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span>&#123;</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">int</span> s_addr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>IP地址总是以（大端法）网络字节顺序存放的，主机字节顺序是小端法，Unix提供了下面的转换函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> <span class="title">htonl</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> hostlong)</span></span>; <span class="comment">//将32位主机字节顺序转为网络字节顺序</span></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> <span class="title">htons</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> hostshort)</span></span>;  <span class="comment">//16位</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> <span class="title">ntohl</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> netlong)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> <span class="title">ntohs</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> netshort)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>下面的函数实现IP地址和点分十进制串之间的转换，inet_aton函数将点分十进制串（cp）转为一个网络字节顺序的IP地址，a代表application，n代表network：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">inet_aton</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *cp, struct in_addr *inp)</span></span>;   <span class="comment">//成功返回1，出错返回0</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">char</span> *<span class="title">inet_ntoa</span><span class="params">(struct in_addr in)</span></span>;   <span class="comment">//返回指向点分十进制字符串的指针</span></span><br></pre></td></tr></table></figure>
+
+<p>DNS通过分布世界范围内的数据库来维护的，DNS数据库有上百万的主机条目结构组成的，每条定义了一组域名和一组IP地址之间的映射：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">hostent</span>&#123;</span></span><br><span class="line">    <span class="keyword">char</span> *h_name;      <span class="comment">//域名</span></span><br><span class="line">    <span class="keyword">char</span> **h_aliases;  <span class="comment">//以空值结尾的域名数组</span></span><br><span class="line">    <span class="keyword">int</span> h_addrtype;    <span class="comment">//地址</span></span><br><span class="line">    <span class="keyword">int</span> h_length;     <span class="comment">//地址的长度</span></span><br><span class="line">    <span class="keyword">char</span> **h_addr_list;   <span class="comment">//以空值结尾的地址数组</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>关于网络协议还有网络架构模型各层次的细节等网络的东西就不在这里说了</p>
+<h2 id="套接字接口"><a href="#套接字接口" class="headerlink" title="套接字接口"></a>套接字接口</h2><p>是一组函数，和Unix I/O 函数结合起来创建网络应用</p>
+<p><img src="https://s2.ax1x.com/2019/09/17/nIYkQS.png" alt="nIYkQS.png"></p>
+<p>从Unix<strong>内核</strong>角度看，一个套接字就是通信的一个<strong>端点</strong>，从Unix<strong>程序</strong>的角度看，套接字就是一个有相应描述符的<strong>打开文件</strong>。</p>
+<p>客户端和服务器都是用<strong>socket 函数来创建一个套接字描述符</strong>，但是区别是：</p>
+<ul>
+<li>客户端创建之后再使用<strong>connect 函数来建立和服务器的连接</strong></li>
+<li>而服务器1. 通过<strong>bind 函数将服务器套接字地址和套接字描述符sockfd联系起来</strong>，2. 通过<strong>listen 函数将sockfd从一个主动套接字转换为一个监听套接字</strong>；3. 通过调用<strong>accept 函数等待来自客户端的连接请求，然后记录客户端的套接字地址，并返回一个已连接描述符</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//sockfd成功指向套接字对，serv_addr是连接的服务器端地址，addrlen是套接字地址的长度</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">connect</span><span class="params">(<span class="keyword">int</span> sockfd, struct sockaddr *serv_addr, <span class="keyword">int</span> addrlen)</span></span>;  <span class="comment">//成功返回0，出错返回-1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//my_addr都是连接的服务器端地址</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">bind</span><span class="params">(<span class="keyword">int</span> sockfd, struct scokaddr *my_addr, <span class="keyword">int</span> addrlen)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//backlog表示内核在拒绝连接请求前，队列中等待的未完成连接请求的数量</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">listen</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">int</span> backlog)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//addr指向客户端的套接字</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">accept</span><span class="params">(<span class="keyword">int</span> listenfd, struct sockaddr *addr, <span class="keyword">int</span> *addrlen)</span></span>;  <span class="comment">//成功返回非负连接描述符，出错返回-1</span></span><br></pre></td></tr></table></figure>
+
+<p>监听描述符和已连接描述符的区别：</p>
+<ul>
+<li>监听描述符是作为客户端连接请求的一个端点，它被创建一次，并存在于服务器的整个生命周期</li>
+<li>已连接描述符是客户端和服务器之间已经建立起来了的连接的一个端点，服务器每次接受请求时都会创建一次，它只存在于服务器为一个客户端服务的过程中</li>
+</ul>
+<h2 id="Web服务器"><a href="#Web服务器" class="headerlink" title="Web服务器"></a>Web服务器</h2><h3 id="web基础"><a href="#web基础" class="headerlink" title="web基础"></a>web基础</h3><p>web 客户端与服务器间交互基于文本的应用级协议，叫HTTP，web 内容可以用HTML 语言来编写，内容分两种：</p>
+<ul>
+<li>静态：服务器取一个磁盘文件并将其内容返回给客户端，磁盘文件叫做<strong>静态文件</strong>，返回文件给客户端的过程叫做<strong>服务静态内容</strong></li>
+<li>动态：运行一个可执行文件，并将它的输出返回给客户端，运行可执行文件产生的输出叫做动态内容，返回给客户端的过程叫做<strong>服务动态内容</strong></li>
+</ul>
+<p>每条web 服务器返回的内容都是和它管理的某个文件相关联的，每个文件都有唯一的名字，叫做URL，通用资源定位符，如 <code>http://www.google.com:80/index.html</code>（URI 统一资源标识符是相应的URL 的后缀，即 <code>index/html</code>）</p>
+<p>在事务过程中客户端和服务器使用的是URL 的不同部分：</p>
+<ul>
+<li>客户端使用前缀来决定与哪类服务器联系，服务器在哪里，它监听的端口号是多少</li>
+<li>服务器使用后缀来发现在它文件系统中的文件，并确定请求的静态内容还是动态内容</li>
+</ul>
+<p>服务器如何解释一个URL 的后缀：</p>
+<ul>
+<li>后缀中最开始的 ‘/‘ 不表示Unix 的根目录，而是被请求内容类型的主目录</li>
+<li>如果后缀中只有一个 ‘/‘，所有服务器将其扩展为某个默认的主页，如 /index.html。并且当我们没有输入这个 ‘/‘ 时，游览器还会自动在URL后面添加缺失的 ‘/‘，然后服务器又把 ‘/‘ 扩展到默认的文件名，所以我们输入网址时经常只输入一个 <code>www.google.com</code>就行了</li>
+</ul>
+<h3 id="HTTP事务"><a href="#HTTP事务" class="headerlink" title="HTTP事务"></a>HTTP事务</h3><h4 id="HTTP请求"><a href="#HTTP请求" class="headerlink" title="HTTP请求"></a>HTTP请求</h4><p>组成：一个请求行，后面跟随0个或多个请求报头，再跟随一个空的文本行来终止报头列表。请求行的形式：</p>
+<p><code>&lt;method&gt; &lt;uri&gt; &lt;version&gt;</code></p>
+<p>请求报头还为服务器提供了额外的信息，如浏览器的商标名，MIME 类型，其格式为：</p>
+<p><code>&lt;header name&gt;: &lt;header data&gt;</code></p>
+<h4 id="HTTP响应"><a href="#HTTP响应" class="headerlink" title="HTTP响应"></a>HTTP响应</h4><p>组成：一个响应行，后面跟随0个或多个响应报头，再跟随一个终止报头的空行，再跟随一个响应主体</p>
+<p>一个响应行的格式为：<code>&lt;version&gt; &lt;status code&gt; &lt;status message&gt;</code></p>
+<p>响应报头提供了关于响应的附加信息</p>
+<h3 id="服务动态内容的问题"><a href="#服务动态内容的问题" class="headerlink" title="服务动态内容的问题"></a>服务动态内容的问题</h3><p>CGI 通用网关接口的标准的出现解决了这些问题</p>
+<ol>
+<li>客户端如何将程序参数传给服务器？</li>
+<li>服务器如何将参数传给子程序？</li>
+<li>服务器如何将其他信息传给子程序？</li>
+<li>子进程将它的输出发送到哪里？</li>
+</ol>
+<h3 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a>工作流程</h3><p>基于上图整个的工作流程有 5 步：</p>
+<ol>
+<li>开启服务器（<code>open_listenfd</code>函数，做好接收请求的准备）<ul>
+<li><code>getaddrinfo</code>: 设置服务器的相关信息</li>
+<li><code>socket</code>: 创建 socket descriptor，也就是之后用来读写的 file descriptor<ul>
+<li><code>int socket(int domain, int type, int protocol)</code></li>
+<li>例如 <code>int clientfd = socket(AF_INET, SOCK_STREAM, 0);</code></li>
+<li><code>AF_INET</code> 表示在使用 32 位 IPv4 地址</li>
+<li><code>SOCK_STREAM</code> 表示这个 socket 将是 connection 的 endpoint</li>
+<li>前面这种写法是协议相关的，建议使用 <code>getaddrinfo</code> 生成的参数来进行配置，这样就是协议无关的了</li>
+</ul>
+</li>
+<li><code>bind</code>: 请求 kernel 把 socket address 和 socket descriptor 绑定<ul>
+<li><code>int bind(int sockfd, SA *addr, socklen_t addrlen);</code></li>
+<li>The process can read bytes that arrive on the connection whose endpoint is <code>addr</code> by reading from descriptor <code>sockfd</code></li>
+<li>Similarly, writes to <code>sockfd</code> are transferred along connection whose endpoint is <code>addr</code></li>
+<li>最好是用 <code>getaddrinfo</code> 生成的参数作为 <code>addr</code> 和 <code>addrlen</code></li>
+</ul>
+</li>
+<li><code>listen</code>: 默认来说，我们从<code>socket</code>函数中得到的 descriptor 默认是 active socket（也就是客户端的连接），调用<code>listen</code>函数告诉 kernel 这个 socket 是被服务器使用的<ul>
+<li><code>int listen(int sockfd, int backlog);</code></li>
+<li>把 <code>sockfd</code> 从 active socket 转换成 listening socket，用来接收客户端的请求</li>
+<li><code>backlog</code> 的数值表示 kernel 在接收多少个请求之后（队列缓存起来）开始拒绝请求</li>
+</ul>
+</li>
+<li>[*]<code>accept</code>: 调用<code>accept</code>函数，开始等待客户端请求<ul>
+<li><code>int accept(int listenfd, SA *addr, int *addrlen);</code></li>
+<li>等待绑定到 <code>listenfd</code> 的连接接收到请求，然后把客户端的 socket address 写入到 <code>addr</code>，大小写入到 <code>addrlen</code></li>
+<li>返回一个 connected descriptor 用来进行信息传输（类似 Unix I/O）</li>
+<li>具体的过程可以参考 图3</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>开启客户端（<code>open_clientfd</code>函数，设定访问地址，尝试连接）<ul>
+<li><code>getaddrinfo</code>: 设置客户端的相关信息，具体可以参见 图1&amp;2</li>
+<li><code>socket</code>: 创建 socket descriptor，也就是之后用来读写的 file descriptor</li>
+<li><code>connect</code>: 客户端调用<code>connect</code>来建立和服务器的连接<ul>
+<li><code>int connect(int clientfd, SA *addr, socklen_t addrlen);</code></li>
+<li>尝试与在 socker address <code>addr</code> 的服务器建立连接</li>
+<li>如果成功 <code>clientfd</code> 可以进行读写</li>
+<li>connection 由 socket 对描述 <code>(x:y, addr.sin_addr:addr.sin_port)</code></li>
+<li><code>x</code> 是客户端地址，<code>y</code> 是客户端临时端口，后面的两个是服务器的地址和端口</li>
+<li>最好是用 <code>getaddrinfo</code> 生成的参数作为 <code>addr</code> 和 <code>addrlen</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>交换数据（主要是一个流程循环，客户端向服务器写入，就是发送请求；服务器向客户端写入，就是发送响应）<ul>
+<li>[Client]<code>rio_writen</code>: 写入数据，相当于向服务器发送请求</li>
+<li>[Client]<code>rio_readlineb</code>: 读取数据，相当于从服务器接收响应</li>
+<li>[Server]<code>rio_readlineb</code>: 读取数据，相当于从客户端接收请求</li>
+<li>[Server]<code>rio_writen</code>: 写入数据，相当于向客户端发送响应</li>
+</ul>
+</li>
+<li>关闭客户端（主要是<code>close</code>）<ul>
+<li>[Client]<code>close</code>: 关闭连接</li>
+</ul>
+</li>
+<li>断开客户端（服务接收到客户端发来的 EOF 消息之后，断开已有的和客户端的连接）<ul>
+<li>[Server]<code>rio_readlineb</code>: 收到客户端发来的关闭连接请求</li>
+<li>[Server]<code>close</code>: 关闭与客户端的连接</li>
+</ul>
+</li>
+</ol>
+<h2 id="Tiny-Web-Server"><a href="#Tiny-Web-Server" class="headerlink" title="Tiny Web Server"></a>Tiny Web Server</h2><p>用c语言实现一个简单的服务器，很刺激</p>
+<h3 id="main函数"><a href="#main函数" class="headerlink" title="main函数"></a>main函数</h3><p>是主程序，通过调用open_listenfd函数打开一个监听套接字后就无限服务器循环，不断接受连接请求，再执行事务</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> listenfd, connfd, port, clientlen;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">clientaddr</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (argc != <span class="number">2</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//fprintf()函数根据指定的format(格式)发送信息(参数)到由stream(流)指定的文件</span></span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;usage:%s &lt;port&gt;\n&quot;</span>, argv[<span class="number">0</span>]);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    port = atoi(argv[<span class="number">1</span>]);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//open_listenfd 函数打开一个监听套接字</span></span><br><span class="line">    listenfd = Open_listenfd(port);</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        clientlen = <span class="keyword">sizeof</span>(clientaddr);</span><br><span class="line">        <span class="comment">//不断接收连接请求，返回连接描述符</span></span><br><span class="line">        connfd = Accept(listenfd, (SA *)&amp;clientaddr, &amp;clientlen);</span><br><span class="line">        doit(connfd);  <span class="comment">//执行事务</span></span><br><span class="line">        close(connfd);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="doit-函数"><a href="#doit-函数" class="headerlink" title="doit 函数"></a>doit 函数</h3><p>处理一个HTTP事务，首先读和解析请求行，目前只支持get方法，如果客户端请求其他方法就发送一个错误信息给它。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doit</span><span class="params">(<span class="keyword">int</span> fd)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> is_static;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">sbuf</span>;</span></span><br><span class="line">    <span class="keyword">char</span> buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];</span><br><span class="line">    <span class="keyword">char</span> filename[MAXLINE], cgiargs[MAXLINE];</span><br><span class="line">    <span class="keyword">rio_t</span> rio;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//读取请求行和headers</span></span><br><span class="line">    Rio_readinitb(&amp;rio, fd);</span><br><span class="line">    Rio_readlineb(&amp;rio, buf, MAXLINE);</span><br><span class="line">    <span class="built_in">sscanf</span>(buf, <span class="string">&quot;%s %s %s&quot;</span>, method, uri, version);  <span class="comment">//从字符串读取格式化输入</span></span><br><span class="line">    <span class="keyword">if</span> (strcasecmp(method, <span class="string">&quot;GET&quot;</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        clienterror(fd, method, <span class="string">&quot;501&quot;</span>, <span class="string">&quot;Not Implemented&quot;</span>, <span class="string">&quot;Tiny does not implement this method&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//读并且忽略任何请求报头</span></span><br><span class="line">    read_requesthdrs(&amp;rio);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//从GET请求中解析URI</span></span><br><span class="line">    is_static = parse_uri(uri, filename, cgiargs);</span><br><span class="line">    <span class="comment">//stat()用来将参数file_name 所指的文件状态, 复制到参数buf 所指的结构中</span></span><br><span class="line">    <span class="keyword">if</span> (stat(filename, &amp;sbuf) &lt; <span class="number">0</span>) </span><br><span class="line">    &#123;</span><br><span class="line">        clienterror(fd, filename, <span class="string">&quot;404&quot;</span>, <span class="string">&quot;Not found&quot;</span>, <span class="string">&quot;Tiny couldn&#x27;t find this file&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (is_static)   <span class="comment">//处理静态内容</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//通过属性判断给定的文件，S_ISREG是否是一个常规文件，S_IRUSR判断文件所有者具可读取权限</span></span><br><span class="line">        <span class="keyword">if</span> (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR &amp; *sbuf.st_mode)) </span><br><span class="line">        &#123;</span><br><span class="line">            clienterror(fd, filename, <span class="string">&quot;403&quot;</span>, <span class="string">&quot;Forbidden&quot;</span>, <span class="string">&quot;Tiny couldn&#x27;t read this file&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        serve_static(fd, filename, sbuf.st_size);  <span class="comment">//服务静态内容</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>   <span class="comment">//动态内容</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//S_IXUSR判断文件所有者具可执行权限</span></span><br><span class="line">        <span class="keyword">if</span> (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR &amp; *sbuf.st_mode))</span><br><span class="line">        &#123;</span><br><span class="line">            clienterror(fd, filename, <span class="string">&quot;403&quot;</span>, <span class="string">&quot;Forbidden&quot;</span>, <span class="string">&quot;Tiny couldn&#x27;t run this CGI program&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        serve_dynamic(fd, filename, cgiargs);   <span class="comment">//服务动态内容</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中用到的一些函数就不再贴出其代码啦</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>主要是了解互联网络（internet）和因特网（Internet）的基本概念以及 web 服务器的一些基础知识，比如使用的协议，通信的事务流程，如何提供静态内容与动态内容</p>
+<p>客户端-服务器模型：利用套接字接口进行通信，一个套接字时连接的一个端点，连接通过文件描述符的形式提供给应用程序，而套接字接口提供了打开和关闭套接字描述符的函数，客户端和服务器通过读写这些描述符来实现通信</p>
+<p>用 c 实现一个小的web 服务器，可提供静态内容，也可提供动态内容</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/csapp/" rel="tag"># csapp</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/09/19/%E5%BC%95%E7%94%A8%E7%9A%84%E5%9D%91/" rel="prev" title="List引用的坑">
+                  <i class="fa fa-chevron-left"></i> List引用的坑
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/10/02/CSAPP%E5%B9%B6%E5%8F%91/" rel="next" title="CSAPP并发编程">
+                  CSAPP并发编程 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">小小KUN</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

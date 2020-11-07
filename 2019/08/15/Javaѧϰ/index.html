@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="看Java编程思想做的一点笔记，有点乱，但也能看，，， 异常throws考虑如下情况：主方法调用method1, method1调用method2, method2中打开文件  method2中需要进行异常处理，但是method2不打算处理，而是把这个异常通过throws 抛出去。在方法声明中使用throws处理异常。 那么method1就会接到该异常。 处理办法也是两种，要么是try catch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java笔记">
+<meta property="og:url" content="http://yoursite.com/2019/08/15/Java%D1%A7%CF%B0/index.html">
+<meta property="og:site_name" content="suTrue">
+<meta property="og:description" content="看Java编程思想做的一点笔记，有点乱，但也能看，，， 异常throws考虑如下情况：主方法调用method1, method1调用method2, method2中打开文件  method2中需要进行异常处理，但是method2不打算处理，而是把这个异常通过throws 抛出去。在方法声明中使用throws处理异常。 那么method1就会接到该异常。 处理办法也是两种，要么是try catch">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-08-15T09:19:50.000Z">
+<meta property="article:modified_time" content="2019-08-15T09:19:50.000Z">
+<meta property="article:author" content="小小KUN">
+<meta property="article:tag" content="语言">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://yoursite.com/2019/08/15/Java%D1%A7%CF%B0/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>java笔记 | suTrue</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">suTrue</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8"><span class="nav-number">1.</span> <span class="nav-text">异常</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#throws"><span class="nav-number">1.1.</span> <span class="nav-text">throws</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.</span> <span class="nav-text">对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B1%BB"><span class="nav-number">3.</span> <span class="nav-text">类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%8D%E7%94%A8%E7%B1%BB"><span class="nav-number">3.1.</span> <span class="nav-text">复用类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A5%E5%8F%A3"><span class="nav-number">3.2.</span> <span class="nav-text">接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E9%83%A8%E7%B1%BB"><span class="nav-number">3.3.</span> <span class="nav-text">内部类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E6%80%81"><span class="nav-number">4.</span> <span class="nav-text">多态</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%91%E4%B8%8A%E8%BD%AC%E5%9E%8B%EF%BC%9A"><span class="nav-number">4.1.</span> <span class="nav-text">向上转型：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%91%E5%AE%9A"><span class="nav-number">4.2.</span> <span class="nav-text">绑定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%92%8C%E6%9E%90%E6%9E%84"><span class="nav-number">4.3.</span> <span class="nav-text">构造和析构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-number">5.</span> <span class="nav-text">操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E5%92%8C%E6%B8%85%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">初始化和清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8"><span class="nav-number">7.</span> <span class="nav-text">容器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%9B%E5%9E%8B%E8%BD%AC%E6%8D%A2"><span class="nav-number">7.1.</span> <span class="nav-text">泛型转换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%AD%E4%BB%A3%E5%99%A8"><span class="nav-number">7.2.</span> <span class="nav-text">迭代器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91"><span class="nav-number">8.</span> <span class="nav-text">并发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%9C%BA%E5%88%B6"><span class="nav-number">8.1.</span> <span class="nav-text">基本机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E8%B5%84%E6%BA%90"><span class="nav-number">8.2.</span> <span class="nav-text">共享资源</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%A6%E7%B1%8D"><span class="nav-number">9.</span> <span class="nav-text">书籍</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">小小KUN</p>
+  <div class="site-description" itemprop="description">wake the fuck up</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/15/Java%D1%A7%CF%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java笔记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-08-15 17:19:50" itemprop="dateCreated datePublished" datetime="2019-08-15T17:19:50+08:00">2019-08-15</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>看Java编程思想做的一点笔记，有点乱，但也能看，，，</p>
+<h2 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h2><h3 id="throws"><a href="#throws" class="headerlink" title="throws"></a>throws</h3><p>考虑如下情况：<br>主方法调用method1, method1调用method2, method2中打开文件</p>
+<ul>
+<li>method2中需要进行异常处理，但是method2<strong>不打算处理</strong>，而是把这个异常通过<strong>throws</strong> <strong>抛出去</strong>。在方法声明中使用throws处理异常。</li>
+<li>那么method1就会<strong>接到该异常</strong>。 处理办法也是两种，要么是try catch处理掉，要么也是<strong>抛出去</strong>。</li>
+<li>method1选择本地 try catch 住，一旦try catch住了，就相当于把这个异常消化掉了，主方法在调用method1的时候，就不需要进行异常处理了  </li>
+</ul>
+<h2 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h2><p>将对象看作“服务提供者”，程序本身将向用户提供服务，它将调用其他对象提供的服务来实现这一目的。我们的目标是创建或寻找能够提供理想的服务来解决问题的一系列对象。</p>
+<a id="more"></a>
+
+<p>通过继承而产生的类型等价性是理解面向对象程序设计方法内涵的重要门槛。</p>
+<p>一切都是对象，通过操作对象的一个引用来使用对象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">有五个地方存储对象：</span><br><span class="line"></span><br><span class="line">- 寄存器：最快的存储区，但数量有限，不能直接控制，也无法在程序中感知到。</span><br><span class="line">- 堆栈：位于通用RAM（随机访问存储器）中，可通过堆栈指针使用，指针的移动来进行分配或释放。存储对象引用。但Java系统需要知道所有在堆栈中的数据的生命周期。</span><br><span class="line">- 堆：一种通用内存池，存放所有Java对象，不需知道数据的生命周期。但是分配和清理更慢一点。</span><br><span class="line">- 常量存储：常量一般直接放在程序中，但若常量本身会与其他部分隔离开，则可以将其存放于ROM中。</span><br><span class="line">- 非RAM存储：数据（如流对象，持久化对象）完全存活于程序之外，即把对象转化为存放在其他媒介上的事物，在需要时再进行恢复。</span><br><span class="line"></span><br><span class="line">但是基本类型很小，常用，也用堆存放的话效率太低，所以创建一个非引用的自动变量来直接存储 “值”，并置于堆栈中。基本类型存储的是实际值，所以在赋值后，改变一个变量时彼此不会相互影响。而为对象赋值时（包括基本类型数组）就不行了，因为赋值实际上复制的是引用。</span><br></pre></td></tr></table></figure>
+
+<p>使用new创建一个对象时，它可以存活于作用域之外，但是引用将无法再作用域外使用。所以只需要创建对象，当不再使用时他们会自动消失，因为Java的垃圾回收器会监视new创建的所有对象，并辨别不再被引用的对象并释放他们的内存空间。</p>
+<h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2><p>其中基本数据类型即使没有初始化也会有一个默认值，但是局部变量并没有</p>
+<p>类中方法的参数传递的是对象的引用</p>
+<p>每个编译单元（即一个.Java文件）都只能有一个public类，即只有一个单一的接口，如果不声明public，则为包访问权限。但不能声明为private或protected</p>
+<p>包是一种解决命名冲突的方式，通过利用操作系统的目录层次方式来实现的，在CLASSPATH中通过目录查找方式来实现包中文件的查找。</p>
+<h3 id="复用类"><a href="#复用类" class="headerlink" title="复用类"></a>复用类</h3><p>组合和继承，代理（不直接支持）</p>
+<ul>
+<li>存在继承关系的子类构造时会先调用父类构造方法，当存在默认构造器（即无参数）时创建子类对象会自动创建基类的子对象，但是当没有默认构造器时，需要在子类构造方法中使用 super(参数) 显式调用基类构造器。</li>
+<li>代理介于组合和继承之间，在类中提供对象成员，并将其方法重写到该类中。</li>
+<li>在子类中重载（不是复写）父类的一个方法时，不会屏蔽父类的该方法。但是复写会屏蔽。</li>
+<li>判断用组合还是继承的一个方法是1. 看是否需要进行向上转型，若需要则必须继承。2. 用继承表达行为间的差异，用字段表达状态上的变化</li>
+<li>final关键字：对基本类型使用时可以在编译期替换为常量，减轻运行负担。对对象引用使用时，final使引用恒定不变，但引用指向的对象自身可以被修改。一般使用final修饰方法为了锁定方法以防任何继承类修改它的含义。当将某个类整体定义为final时，表明不想任何类继承它</li>
+<li>类的初始化和加载：每个类的编译代码在需要使用时（初次使用时）才会被加载，通常发生在创建类的第一个对象时，<strong>但是当访问static域或static方法时也会加载</strong>。于是先初始化static方法或域，然后按正常步骤调用构造函数等等，，，</li>
+</ul>
+<h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><ul>
+<li>interface关键字产生一个完全抽象的类，没有提供任何实现。只提供形式，包括方法名，参数，返回类型。是一个极端的抽象类。</li>
+<li>interface内可包含域，隐式的声明为static final。接口内的方法一定是public</li>
+<li>使用接口是为了能向上转型为多个基类，同时防止创建该类的对象。如果要创建不带任何方法定义和成员变量的基类，那么就该选择接口而不是抽象类。</li>
+<li><strong>继承是一个 “是不是”的关系，而 接口 实现则是 “有没有”的关系</strong>。对于抽象类，如果需要添加新的方法，可以直接在抽象类中添加具体的实现，子类可以不进行变更；而对于接口则不行，如果接口进行了变更，则所有实现这个接口的类都必须进行相应的改动。</li>
+<li>常用方法是在策略设计模式中，可以用任何想要的对象来调用我的方法，只要对象遵循我的接口</li>
+<li>优先选择类，如果接口很有必要，那么就进行重构。在打算组合的不同接口中使用相同的方法名通常会造成代码可读性变差，应尽量避免</li>
+</ul>
+<h3 id="内部类"><a href="#内部类" class="headerlink" title="内部类"></a>内部类</h3><ul>
+<li>使用方法：从外部类的非静态方法之外的任意位置创建某个内部类的对象，必须具体指明这个对象的类型，<code>外部类名字.内部类名字</code>。当使用外部类直接创建内部类时（不使用方法返回内部类对象）要用<code>外部类.new 内部类</code> 来创建。</li>
+<li>生成的内部类对象可以直接访问外部类的所有元素。原理是当某个外部类创建一个内部类对象时，内部对象会秘密捕获一个指向外部类对象的引用。所以拥有外部类之前无法创建内部类对象（出了静态内部类）。然后当访问外部类成员时都是用那个引用来进行访问的，编译器会将这些细节隐藏。</li>
+<li>可以在内部类中实现一个接口，返回该接口的一个对象，那么就完全阻止了依赖对象的编码，完全隐藏了实现细节。</li>
+<li>可以在一个方法或任意作用域内定义内部类，称为局部内部类，可以在同一子目录下的其他内部类中使用该内部类。</li>
+<li>匿名类</li>
+<li>嵌套类</li>
+<li>为什么需要：每个内部类都能独立的继承自一个（接口的）实现，所以无论外围类是否已经继承了某个（接口的）实现，对于内部类都没有影响。内部类有效的实现了”多重继承“</li>
+</ul>
+<h2 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h2><h3 id="向上转型："><a href="#向上转型：" class="headerlink" title="向上转型："></a>向上转型：</h3><p>当父类引用调用子类对象时，所使用的是父类中的方法，而父类中的方法在子类中都存在，所以这样调用是安全的。相反子类引用指向父类对象时（向下转型），子类可能含有父类没有的方法，那么就不安全，需要在运行期进行类型检查。</p>
+<h3 id="绑定"><a href="#绑定" class="headerlink" title="绑定"></a>绑定</h3><p>实现多态就需要后期绑定，Java中除了static和final方法外，都是后期绑定的。所以static方法和final方法（private方法属于final）都不能重写。同时域访问操作也都由编译器解析，因此不是多态的。</p>
+<h3 id="构造和析构"><a href="#构造和析构" class="headerlink" title="构造和析构"></a>构造和析构</h3><ul>
+<li>子类对象构造时需要调用父类构造函数生成一个父类对象，因为父类中的域只有他自己能访问进行初始化。</li>
+<li>如果在父类构造方法中调用一个方法（该方法在子类中被重写），此时由于子类构造方法还未调用，所以域还没有初始化，可能会造成问题。<strong>所以初始化的实际过程是在其他任何事物发生之前将分配给对象的储存空间初始化为二进制的零</strong>。之后的调用顺序和之前所说的一样。</li>
+<li>因此编写构造器时一条准则是：用尽可能简单的方法使对象进入正常状态；可以的话，避免调用其他方法。可以安全调用的方法是基类中的final方法。</li>
+<li>如果需要进行清理，则和C++中调用析构函数类似。在dispose方法中调用基类和组合类对象的dispose方法。</li>
+</ul>
+<p>用继承还是组合：用继承表达行为间的差异，用字段表达状态上的变化</p>
+<h2 id="操作符"><a href="#操作符" class="headerlink" title="操作符"></a>操作符</h2><ul>
+<li>System.out.printl() 中String后如果有 + 号的话，会尝试将紧跟着的非String类转换为String类，但如果先执行的是个非String类，则执行完后再转换。</li>
+<li>== 和 != 比较的是对象的引用，equals()比较的是对象中的内容，但是该方法不适用于基本类型，而且只能用在重写了equals() 方法的类中，因为该方法默认的是比较引用。</li>
+<li>不可将非布尔值作为布尔值在逻辑表达式使用，如 <code>int a = 5; !a;</code> 就是一个非法的语句</li>
+<li>进行窄化转化（narrowing conversion）必须显示进行转换</li>
+<li>对基本数据类型执行算术运算或位运算，只要类型比int小（如char, byte, short），就会在运算前自动转换为int</li>
+</ul>
+<h2 id="初始化和清理"><a href="#初始化和清理" class="headerlink" title="初始化和清理"></a>初始化和清理</h2><p>垃圾回收器会自动回收那些由 new创建的对象，但没有通过new创建的对象则需要再类中定义一个 finalize() 方法。但是finalize不等于c+中的析构函数，在C++中对象一定会被销毁，但Java却不一定总是被垃圾回收</p>
+<ol>
+<li>对象可能不被垃圾回收</li>
+<li>垃圾回收并不等于析构</li>
+<li>垃圾回收只与内存有关</li>
+</ol>
+<p>使用垃圾回收器只为了回收程序不再使用的内存，所以使用finalize的只有一种特殊情况，即通过本地方法调用了C或C++代码以malloc分配的内存，此时需要在 finalize() 方法中调用free()函数来释放。</p>
+<p>JVM不会浪费时间执行垃圾回收如果内存未耗尽的话</p>
+<p>垃圾回收器的工作原理（P90）：“停止—复制” 和 “标记—清扫” 两种模式自适应执行。都是从堆栈和静态区出发扫描所有的引用。但是 停止—复制 适用于垃圾较多时，标记—清扫 适用于少量垃圾。</p>
+<h2 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h2><p>使用泛型制定了容器实例可以保存的类型，可在编译期避免将错误类型的对象放到容器中。</p>
+<h3 id="泛型转换"><a href="#泛型转换" class="headerlink" title="泛型转换"></a>泛型转换</h3><ul>
+<li>子类泛型不能转父类泛型</li>
+<li>父类泛型也不能转子类泛型</li>
+<li>但是在使用 <code>？extends</code> 通配符时可以将子类泛型转为父类泛型，但是父类泛型不能放东西只能取。</li>
+<li>使用 <code>？super</code> 通配符时可以将父类泛型转为子类泛型，但是子类泛型不能取东西只能放。</li>
+</ul>
+<p>划分为两个概念：</p>
+<ul>
+<li>Collection：一个独立元素的序列，这些元素都服从一条或多条规则，Collection.addAll()只接受另一个Collection对象作为参数</li>
+<li>Map：一组成对的键值对对象，允许使用键来查值</li>
+</ul>
+<h3 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h3><p>也是一种设计模式，为了能实现处理不同容器类型间方法代码的复用。迭代器是一个对象，工作是遍历并选择序列中的对象。</p>
+<h2 id="并发"><a href="#并发" class="headerlink" title="并发"></a>并发</h2><h3 id="基本机制"><a href="#基本机制" class="headerlink" title="基本机制"></a>基本机制</h3><ul>
+<li>解决 速度 和 设计可管理性</li>
+<li>设计并发是因为阻塞存在</li>
+<li>编写多线程困难之一在于协调不同线程对资源的使用</li>
+<li>进程间并发简单很多，安全很多</li>
+<li>线程驱动任务，由Runnable接口提供，并编写run方法，然后将Runnable对象交给一个Thread构造器。Callabel接口调用call方法，有返回值。线程并不是任务，Thread类自身不执行任何操作，他只是驱动赋予他的任务。</li>
+<li>使用yield方法是暗示本线程工作做得差不多了，可以让给同级别的别的线程了，但只是建议不一定执行。</li>
+<li>后台线程（守护线程）是在程序运行时在后台提供通用服务的线程，并不是必须的。当程序所有非后台线程都结束时程序也就终止了。守护线程通常会被用来做日志，性能统计等工作。</li>
+<li>不能直接捕获线程中逃逸的异常，但可以使用Executor解决</li>
+</ul>
+<h3 id="共享资源"><a href="#共享资源" class="headerlink" title="共享资源"></a>共享资源</h3><p>通过加锁，每个访问临界共享资源的方法都必须被同步。</p>
+<p>使用并发时，要将域设为private，为了使synchronized关键字能防止其他类访问域。</p>
+<p>不要依赖于原子操作</p>
+<p>lock使用繁琐一点但是更加灵活，控制程度更高。</p>
+<p>防止资源冲突的另一个方式是根除对变量的共享。线程本地存储是一种自动化机制，可以为使用相同变量的每个不同的线程都创建不同的存储。ThreadLocal对象通常当作静态域存储，只能通过get和set方法来访问</p>
+<h2 id="书籍"><a href="#书籍" class="headerlink" title="书籍"></a>书籍</h2><ul>
+<li>Java编程思想</li>
+<li>Java并发编程实战</li>
+<li>深入理解JVM</li>
+<li>函数式编程思维</li>
+<li>tcp/ip详解</li>
+<li>鸟哥的linux私房菜</li>
+<li>spring mvc ＋mybatis开发从入门到精通</li>
+<li>spring技术内幕</li>
+<li>elasticsearch服务器开发</li>
+<li>redis入门指南</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AF%AD%E8%A8%80/" rel="tag"># 语言</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2019/07/11/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%EF%BC%88%E4%B8%80%EF%BC%89/" rel="prev" title="设计模式(一)">
+                  <i class="fa fa-chevron-left"></i> 设计模式(一)
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/08/17/%E5%B0%84%E9%9B%95/" rel="next" title="可恶又迷人的恋爱酸臭味">
+                  可恶又迷人的恋爱酸臭味 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">小小KUN</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

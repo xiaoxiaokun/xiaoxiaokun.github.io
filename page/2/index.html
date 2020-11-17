@@ -161,7 +161,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">22</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -199,6 +199,97 @@
       
 
       
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/24/CSAPP%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/08/24/CSAPP%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/" class="post-title-link" itemprop="url">CSAPP虚拟存储器</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-08-24 10:34:26" itemprop="dateCreated datePublished" datetime="2019-08-24T10:34:26+08:00">2019-08-24</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="什么是虚拟存储器"><a href="#什么是虚拟存储器" class="headerlink" title="什么是虚拟存储器"></a>什么是虚拟存储器</h2><p>一种对主存的抽象概念，为每个进程提供一个<strong>更大的</strong>，一致的和私有的地址空间。</p>
+<p>物理内存 + 磁盘 = 虚拟内存</p>
+<h3 id="一些概念"><a href="#一些概念" class="headerlink" title="一些概念"></a>一些概念</h3><h4 id="什么是物理地址，虚拟地址"><a href="#什么是物理地址，虚拟地址" class="headerlink" title="什么是物理地址，虚拟地址"></a>什么是物理地址，虚拟地址</h4><ul>
+<li>物理地址单指主存中的地址，系统将主存看作是一个非常大由M个连续字节大小的单元组成的数组，每个字节都有一个唯一的物理地址，第一个字节的地址为0，下面一个是1，以此类推</li>
+<li>同理在虚拟存储器中的数组元素的地址就是虚拟地址</li>
+</ul>
+<h4 id="什么是物理寻址，虚拟寻址"><a href="#什么是物理寻址，虚拟寻址" class="headerlink" title="什么是物理寻址，虚拟寻址"></a>什么是物理寻址，虚拟寻址</h4><ul>
+<li>CPU使用物理地址访问主存的方式就叫做物理寻址</li>
+<li>同理使用虚拟地址访问主存的方式叫做虚拟寻址，CPU通过生成一个虚拟地址来访问主存，这个虚拟地址在被送到存储器前先转换为适当的物理地址</li>
+</ul>
+<h4 id="什么是地址空间"><a href="#什么是地址空间" class="headerlink" title="什么是地址空间"></a>什么是地址空间</h4><p>是一个非负整数地址的有序集合，如果整数是连续的，就是一个线性地址空间</p>
+<ul>
+<li>虚拟地址空间：<ul>
+<li>有2的n次方个地址的地址空间，n是电脑位数决定的，比如32位，64位</li>
+<li>位数是<strong>数据总线的宽度，是指一次能传输的数据的位数，通常就是CPU一次能处理的数据的位数，所以字长就是取决于数据总线</strong></li>
+<li>所以虚拟存储器的大小是不一定的，同时有上限的，我们可以设置的非常大，但是访问不到也就没有用了</li>
+</ul>
+</li>
+<li>物理地址空间：与系统中物理存储器的M个字节相对应</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/08/24/CSAPP%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8%E5%99%A8/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
     
 
 
@@ -953,101 +1044,6 @@
 <li>客户程序无需获知对象的具体类型，只需知道对象所具有的接口</li>
 <li>减少系统中各部分的依赖关系，从而实现“高内聚，松耦合”的类型设计方案</li>
 </ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/12/%E8%B4%A6%E5%8D%95%E5%B0%8F%E9%A1%B9%E7%9B%AE/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="suTrue">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/05/12/%E8%B4%A6%E5%8D%95%E5%B0%8F%E9%A1%B9%E7%9B%AE/" class="post-title-link" itemprop="url">账单小项目</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-05-12 10:27:04" itemprop="dateCreated datePublished" datetime="2019-05-12T10:27:04+08:00">2019-05-12</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>只是用来练习Java的一个项目</p>
-<h2 id="整体结构如下："><a href="#整体结构如下：" class="headerlink" title="整体结构如下："></a>整体结构如下：</h2><ul>
-<li>界面显示包 gui：下面又分了5个包<ul>
-<li>frame：存放一个顶级容器来存放所有的面板</li>
-<li>panel：存放显示各个页面的panel类</li>
-<li>model：存放2个表格类</li>
-<li>listener：存放每个panel中触发器的类和一个顶部toolbar触发器类</li>
-<li>page：存放首页spend中数据的类</li>
-</ul>
-</li>
-<li>存放工具类的包：包括日期处理类，颜色设置类等等</li>
-<li>实体类包entity：对3张表进行映射，存放3个类</li>
-<li>dao类：把实例与数据库中表进行映射，包含一些处理表的数据的方法，其中使用sql命令</li>
-<li>业务处理包service：存放业务类，是对dao类的再封装，使得操作表中数据更加的方便</li>
-<li>startup：存放了一个启动类</li>
-</ul>
-<h2 id="几处注意的地方："><a href="#几处注意的地方：" class="headerlink" title="几处注意的地方："></a>几处注意的地方：</h2><ol>
-<li><p>entity，dao，service之间的关系：</p>
-<p>Listener ====&gt; Service ====&gt; Dao ====&gt; 数据库</p>
-</li>
-<li><p>每一个界面的panel都继承自一个自定义的WorkingPanel类：因为功能相似，所以抽象出一个父类，提供 addListener() 和 updateData() 两个虚方法。</p>
-</li>
-<li><p>对常用方法进行封装了形成几个工具类：</p>
-</li>
-<li><p>将每个panel中触发器进行封装重写：</p>
-</li>
-<li><p>类成员的访问权限</p>
-</li>
-<li><p>每个panel都是单例模式</p>
-</li>
-</ol>
 
       
     </div>

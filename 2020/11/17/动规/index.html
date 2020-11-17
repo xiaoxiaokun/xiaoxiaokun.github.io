@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+
+  <meta name="description" content="DP主要用来解决两类问题：计数，优化。计数是说给一些资源，去得到某种解的方法数有多少或者得到某种解的最（大&#x2F;小）值。优化是说很多时间复杂度达到2^n的搜索、递归问题可以用DP来优化。 使用DP有三个要求：最优子结构（把大问题分为多个小问题，只要最优解决小问题就可以最优解决大问题），子问题被重复求解（overlapped，重复了才能优化嘛），没有后效性（子问题的最优解不会在解决后面的较大问题时被改变">
+<meta property="og:type" content="article">
+<meta property="og:title" content="动规动规">
+<meta property="og:url" content="http://yoursite.com/2020/11/17/%E5%8A%A8%E8%A7%84/index.html">
+<meta property="og:site_name" content="suTrue">
+<meta property="og:description" content="DP主要用来解决两类问题：计数，优化。计数是说给一些资源，去得到某种解的方法数有多少或者得到某种解的最（大&#x2F;小）值。优化是说很多时间复杂度达到2^n的搜索、递归问题可以用DP来优化。 使用DP有三个要求：最优子结构（把大问题分为多个小问题，只要最优解决小问题就可以最优解决大问题），子问题被重复求解（overlapped，重复了才能优化嘛），没有后效性（子问题的最优解不会在解决后面的较大问题时被改变">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ae03.alicdn.com/kf/Hafbdbeb888e641f69f1dc317259d526cR.png">
+<meta property="article:published_time" content="2020-11-17T03:34:58.000Z">
+<meta property="article:modified_time" content="2020-11-17T03:34:58.981Z">
+<meta property="article:author" content="小小KUN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ae03.alicdn.com/kf/Hafbdbeb888e641f69f1dc317259d526cR.png">
+
+
+<link rel="canonical" href="http://yoursite.com/2020/11/17/%E5%8A%A8%E8%A7%84/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>动规动规 | suTrue</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">suTrue</h1>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E9%81%8D%E5%8E%86%E4%BB%A5%E6%B1%82%E5%BE%97%E7%9A%84%E6%89%80%E6%9C%89%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text">1. 遍历以求得的所有解</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#139%E3%80%81%E5%8D%95%E8%AF%8D%E6%8B%86%E5%88%86"><span class="nav-number">1.1.</span> <span class="nav-text">139、单词拆分</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%8A%B6%E6%80%81%E6%9C%BA"><span class="nav-number">2.</span> <span class="nav-text">2. 状态机</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#309%E3%80%81%E5%AD%98%E5%9C%A8%E5%86%B7%E5%8D%B4%E6%9C%9F%E7%9A%84%E8%82%A1%E7%A5%A8%E4%B9%B0%E5%8D%96"><span class="nav-number">2.1.</span> <span class="nav-text">309、存在冷却期的股票买卖</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%97%AE%E9%A2%98%E8%BD%AC%E5%8C%96"><span class="nav-number">3.</span> <span class="nav-text">3. 问题转化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%85%B3%E4%BA%8E%E7%9F%A9%E9%98%B5%E7%9A%84"><span class="nav-number">4.</span> <span class="nav-text">4. 关于矩阵的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%A9%BA%E9%97%B4%E5%8E%8B%E7%BC%A9"><span class="nav-number">5.</span> <span class="nav-text">5. 空间压缩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Other"><span class="nav-number">6.</span> <span class="nav-text">6. Other</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">小小KUN</p>
+  <div class="site-description" itemprop="description">wake the fuck up</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/17/%E5%8A%A8%E8%A7%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          动规动规
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-11-17 11:34:58" itemprop="dateCreated datePublished" datetime="2020-11-17T11:34:58+08:00">2020-11-17</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>DP主要用来解决两类问题：计数，优化。计数是说给一些资源，去得到某种解的方法数有多少或者得到某种解的最（大/小）值。优化是说很多时间复杂度达到2^n的搜索、递归问题可以用DP来优化。</p>
+<p>使用DP有三个要求：最优子结构（把大问题分为多个小问题，只要最优解决小问题就可以最优解决大问题），子问题被重复求解（overlapped，重复了才能优化嘛），没有后效性（子问题的最优解不会在解决后面的较大问题时被改变）。</p>
+<p>获得状态转移方程是最难的一步，总结了一点点思路</p>
+<h3 id="1-遍历以求得的所有解"><a href="#1-遍历以求得的所有解" class="headerlink" title="1. 遍历以求得的所有解"></a>1. 遍历以求得的所有解</h3><p>得到某一种状态需要遍历前面所有已经得出的状态，即求 f[i] 需要遍历 f[1], f[2], …, f[i - 1]。139，813，312，300，410都是这样。</p>
+<h4 id="139、单词拆分"><a href="#139、单词拆分" class="headerlink" title="139、单词拆分"></a>139、单词拆分</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">wordBreak</span><span class="params">(String s, List&lt;String&gt; wordDict)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// f[i] 从第1个到第i个字符的子字符串能否被拆分</span></span><br><span class="line">    <span class="comment">// f[i] = (f[1]...f[k] &amp;&amp; dict.contains(s.substring(k, i)))   k &gt;= 0 &amp;&amp; k &lt; i</span></span><br><span class="line">    <span class="comment">// 时间复杂度：O(n^2)  空间复杂度：O(n)</span></span><br><span class="line"></span><br><span class="line">    HashSet&lt;String&gt; dict = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (String str : wordDict) &#123;</span><br><span class="line">      dict.add(str);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">boolean</span>[] f = <span class="keyword">new</span> <span class="keyword">boolean</span>[s.length() + <span class="number">1</span>];</span><br><span class="line">    f[<span class="number">0</span>] = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= s.length(); i++) &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; i; k++) &#123;				<span class="comment">//这里遍历所有可能解</span></span><br><span class="line">        <span class="keyword">if</span> (f[k] &amp;&amp; dict.contains(s.substring(k, i))) &#123;</span><br><span class="line">          f[i] = <span class="keyword">true</span>;</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> f[s.length()];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<a id="more"></a>
+
+<h3 id="2-状态机"><a href="#2-状态机" class="headerlink" title="2. 状态机"></a>2. 状态机</h3><p>在某一个时刻或位置会有几种不同的状态，不同状态间的转换有一些限制，用这些限制就可以写出状态转移方程。比如309题</p>
+<h4 id="309、存在冷却期的股票买卖"><a href="#309、存在冷却期的股票买卖" class="headerlink" title="309、存在冷却期的股票买卖"></a>309、存在冷却期的股票买卖</h4><p>在卖出后必须冷却一天才能继续买入，每天只能干三件事，买入、啥也不干、卖出。那么状态可以直接设为这3种情况吗？</p>
+<p>实际上不行，因为这里啥也不干包括了2种情况：手里持股啥也不干和不持股啥也不干。那分为四个状态呢？就可以进行计算了。这里还可以降维：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">f[i][0]  买入。     &#x3D; f[i - 1][2] - A[i]</span><br><span class="line">f[i][1]  持股啥也不干   &#x3D; max(f[i - 1][0], f[i - 1][1])</span><br><span class="line">f[i][2]  不持股啥也不干 &#x3D; max(f[i - 1][2], f[i - 1][3])</span><br><span class="line">f[i][3]  卖出。     &#x3D; max(f[i - 1][0], f[i - 1][1]) + A[i]</span><br></pre></td></tr></table></figure>
+
+<p>不过前两种状态实际上也可以合并为一个状态，那就是存在3种状态，持有、休息、卖出：</p>
+<img src="https://ae03.alicdn.com/kf/Hafbdbeb888e641f69f1dc317259d526cR.png" alt="image.png" style="zoom:33%;" />
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">f[i][0]  到第i天持有     &#x3D; max(f[i - 1][0], f[i - 1][1] - prices[i])</span><br><span class="line">f[i][1]  到第i天休息状态  &#x3D; max(f[i - 1][1], f[i - 1][2])</span><br><span class="line">f[i][2]  到第i天售出状态  &#x3D; f[i - 1][0] + prices[i]</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-问题转化"><a href="#3-问题转化" class="headerlink" title="3. 问题转化"></a>3. 问题转化</h3><p>比如576题，将(i, j) 位置上的球移出界的路径数可以转化为将界外的球移到 (i, j) 位置的路径数；</p>
+<p>416分割等和子集的题可以转为求和为是否存在和为 sum 一半的子序列</p>
+<h3 id="4-关于矩阵的"><a href="#4-关于矩阵的" class="headerlink" title="4. 关于矩阵的"></a>4. 关于矩阵的</h3><ol>
+<li>通过<code>dp[i][j] = dp[i][j - 1] + dp[i - 1][j] - dp[i - 1][j - 1] + mat[i -1][j -1];</code>先计算出所有左上角到 (i, j) 点的矩形区域的和</li>
+<li>然后可以快速得到任意指定矩形区域的和，区域 (x1, y1) 到 (x2, y2) 的和为 <code>dp[x2][y2] - dp[x2][y1 - 1] - dp[x1 - 1][y2] + dp[x1 - 1][y1 - 1];</code></li>
+</ol>
+<p>比如1292，1314题，在 n^2 时间内就可以得到所有区域的和了，否则时间复杂度将达到 n^4</p>
+<h3 id="5-空间压缩"><a href="#5-空间压缩" class="headerlink" title="5. 空间压缩"></a>5. 空间压缩</h3><p>很多题都可以进一步压缩空间复杂度，这种题大多数状态转移方程只需要用到前一层或后一层状态，比如121，416题等</p>
+<p><code>f[i][j] = f[i - 1][j] + f[i - 1][j - A[i]]</code>   &gt;&gt;&gt;&gt;  <code>f[j] = f[j] + f[j - A[i]]</code> ?</p>
+<p><code>f[i][j] = f[i - 1][j] + f[i + 1][j]</code></p>
+<p><code>f[i][j] = f[i + 1][j - 1]</code></p>
+<p>516题最长回文字子串题就可以用到滚动数组进行压缩，滚动数组还可以进一步压缩为一个临时变量。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">longestPalindromeSubseq</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// f[i][j]   从第i个字符到第j个字符是否是回文字</span></span><br><span class="line">  <span class="comment">// f[i][j] = f[i + 1][j - 1]  if (s[i] == s[j])</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 滚动数组</span></span><br><span class="line">  <span class="keyword">int</span>[] f0 = <span class="keyword">new</span> <span class="keyword">int</span>[s.length() + <span class="number">1</span>];   <span class="comment">//状态压缩，f0[i]表示长度为l - 1的到第i个字符为止的字符串</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (s.equals(<span class="string">&quot;&quot;</span>)) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= s.length(); i++) f0[i] = <span class="number">1</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = s.length(); i &gt;= <span class="number">1</span>; i--) &#123;</span><br><span class="line">    <span class="keyword">int</span> pre = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt;= s.length(); j++) &#123;</span><br><span class="line">      <span class="keyword">int</span> temp = f0[j];</span><br><span class="line">      <span class="keyword">if</span> (s.charAt(i - <span class="number">1</span>) == s.charAt(j - <span class="number">1</span>)) &#123;</span><br><span class="line">        f0[j] = pre + <span class="number">2</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> f0[j] = Math.max(f0[j], f0[j - <span class="number">1</span>]);</span><br><span class="line">      pre = temp;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> f0[s.length()];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="6-Other"><a href="#6-Other" class="headerlink" title="6. Other"></a>6. Other</h3><p>还有些题连状态方程都很难想，比如486猜赢家，<code>f[i][j]</code>表示从i到j的子序列，先手和后手的分差。啊凭经验与运气了。</p>
+<p>有时还需要一个HashMap记录之前的状态来快速获取结果，如823。</p>
+<p>那就先写这么多，之后有新的想法再更新，那我现在走吧。我是郭富城！</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/11/07/Java%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/" rel="prev" title="Java垃圾回收">
+                  <i class="fa fa-chevron-left"></i> Java垃圾回收
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">小小KUN</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

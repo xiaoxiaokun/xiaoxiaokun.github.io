@@ -24,20 +24,21 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
   </script>
 
-  <meta name="description" content="数据读入：  data&#x3D;pd.read_csv(&quot;E:&#x2F;all_data.csv, header&#x3D;None, sep&#x3D;&quot; &quot;&quot;)  数据存储（无表头）：  data.to_csv(&#39;E:&#x2F;&#x2F;AmazonData&#x2F;data.csv&#39;, header&#x3D;None, index&#x3D;0)  获取每个用户有多少个：  user_num &#x3D; pd.Data">
+  <meta name="description" content="发生了甚么做项目时在构建函数调用图时明明把所有的结点和边信息都写入图中了，但在Echarts生成的图中结点间并没有边。 构建的图使用到了4个类：  classInfo 结点信息类、 clsasNode 结点类，包含classInfo类 classEdge 边类，包含了两个classNode类 classGraph 图类，包含了所有结点类和边类  原来是这样原因是将图片转为echarts所需要的js">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Pandas常用操作">
-<meta property="og:url" content="http://yoursite.com/2019/04/30/pandas/index.html">
+<meta property="og:title" content="重写equals() 和hashCode()">
+<meta property="og:url" content="http://yoursite.com/2020/11/17/%E9%87%8D%E6%96%B0equals()%20%E5%92%8ChashCode()/index.html">
 <meta property="og:site_name" content="suTrue">
-<meta property="og:description" content="数据读入：  data&#x3D;pd.read_csv(&quot;E:&#x2F;all_data.csv, header&#x3D;None, sep&#x3D;&quot; &quot;&quot;)  数据存储（无表头）：  data.to_csv(&#39;E:&#x2F;&#x2F;AmazonData&#x2F;data.csv&#39;, header&#x3D;None, index&#x3D;0)  获取每个用户有多少个：  user_num &#x3D; pd.Data">
+<meta property="og:description" content="发生了甚么做项目时在构建函数调用图时明明把所有的结点和边信息都写入图中了，但在Echarts生成的图中结点间并没有边。 构建的图使用到了4个类：  classInfo 结点信息类、 clsasNode 结点类，包含classInfo类 classEdge 边类，包含了两个classNode类 classGraph 图类，包含了所有结点类和边类  原来是这样原因是将图片转为echarts所需要的js">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2019-04-30T15:10:26.000Z">
-<meta property="article:modified_time" content="2019-04-30T15:10:26.000Z">
+<meta property="article:published_time" content="2020-11-17T11:41:05.000Z">
+<meta property="article:modified_time" content="2020-11-19T10:36:34.368Z">
 <meta property="article:author" content="小小KUN">
+<meta property="article:tag" content="坑，语言">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://yoursite.com/2019/04/30/pandas/">
+<link rel="canonical" href="http://yoursite.com/2020/11/17/%E9%87%8D%E6%96%B0equals()%20%E5%92%8ChashCode()/">
 
 
 <script class="page-configurations">
@@ -50,7 +51,7 @@
   };
 </script>
 
-  <title>Pandas常用操作 | suTrue</title>
+  <title>重写equals() 和hashCode() | suTrue</title>
   
 
 
@@ -138,7 +139,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -151,6 +152,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E7%94%9F%E4%BA%86%E7%94%9A%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">发生了甚么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E6%9D%A5%E6%98%AF%E8%BF%99%E6%A0%B7"><span class="nav-number">2.</span> <span class="nav-text">原来是这样</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E5%95%AA%E7%9A%84%E4%B8%80%E4%B8%8B%E8%A7%A3%E5%86%B3%E4%BA%86%EF%BC%8C%E5%BE%88%E5%BF%AB%E5%95%8A"><span class="nav-number">3.</span> <span class="nav-text">我啪的一下解决了，很快啊</span></a></li></ol></div>
         </section>
         <!--/noindex-->
 
@@ -210,7 +212,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/30/pandas/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/17/%E9%87%8D%E6%96%B0equals()%20%E5%92%8ChashCode()/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -223,7 +225,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Pandas常用操作
+          重写equals() 和hashCode()
         </h1>
 
         <div class="post-meta-container">
@@ -234,8 +236,15 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2019-04-30 23:10:26" itemprop="dateCreated datePublished" datetime="2019-04-30T23:10:26+08:00">2019-04-30</time>
+      <time title="创建时间：2020-11-17 19:41:05" itemprop="dateCreated datePublished" datetime="2020-11-17T19:41:05+08:00">2020-11-17</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-11-19 18:36:34" itemprop="dateModified" datetime="2020-11-19T18:36:34+08:00">2020-11-19</time>
+      </span>
 
   
 </div>
@@ -247,32 +256,28 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <ul>
-<li><p>数据读入：</p>
-<p> <code>data=pd.read_csv(&quot;E:/all_data.csv, header=None, sep=&quot; &quot;&quot;)</code></p>
-</li>
-<li><p>数据存储（无表头）：</p>
-<p> <code>data.to_csv(&#39;E://AmazonData/data.csv&#39;, header=None, index=0)</code></p>
-</li>
-<li><p>获取每个用户有多少个：</p>
-<p> <code>user_num = pd.DataFrame(user.value_counts())</code></p>
-</li>
-<li><p>挑出<strong>不满足</strong>交易数量为1的用户：</p>
-<p><code>multi_user = user_num[(~ user_num[&#39;user&#39;].isin([1]))]</code></p>
-</li>
-<li><p>剪切特定的列：</p>
-<p><code>new_data = data.loc[data[&#39;user&#39;].isin(multi_user.index)]</code></p>
-</li>
-<li><p>删除特定的列：</p>
-<p><code>new_data = new_data.drop(columns=[&#39;Unnamed: 0&#39;]) </code></p>
-</li>
-<li><p>添加特定的列：</p>
-<p> <code>new_counts[&#39;userID&#39;] = new_counts.index</code></p>
-</li>
-<li><p>画直方图：</p>
-<p><code>fig, ax = pyplot.subplots(figsize=(20, 6))sns.distplot(amazon_user, ax=ax)</code></p>
-</li>
-</ul>
+        <h2 id="发生了甚么"><a href="#发生了甚么" class="headerlink" title="发生了甚么"></a>发生了甚么</h2><p>做项目时在构建函数调用图时明明把所有的结点和边信息都写入图中了，但在Echarts生成的图中结点间并没有边。</p>
+<p>构建的图使用到了4个类：</p>
+<ol>
+<li>classInfo 结点信息类、</li>
+<li>clsasNode 结点类，包含classInfo类</li>
+<li>classEdge 边类，包含了两个classNode类</li>
+<li>classGraph 图类，包含了所有结点类和边类</li>
+</ol>
+<h2 id="原来是这样"><a href="#原来是这样" class="headerlink" title="原来是这样"></a>原来是这样</h2><p>原因是将图片转为echarts所需要的json格式时使用了HashMap遍历添加了图中所有结点，之后在把结点和边信息存为json时使用了HashMap中的containsKey方法，containsKey方法中使用了equals和hashCode方法，没有重写这两个方法导致了containsKey在判断时认为两个值相等的不同对象并不相等。</p>
+<p>用上面的图举例子就是：</p>
+<ol>
+<li>声明一个 <code>HashMap&lt;classEdge, Integer&gt; map</code> </li>
+<li>声明一个classEdge变量<code>edge1 = new classEdge(classNode1, classNode2) </code>，并添加进map中 <code>map.put(edge1, 1)</code></li>
+<li>使用<code>map.containsKey(new classEdge(classNode1, classNode2))</code> 时结果为false，因为虽然边的两个node是相同的，但是因为没有重写equals和hashCode方法，这两个边被认为是不同的</li>
+</ol>
+<h2 id="我啪的一下解决了，很快啊"><a href="#我啪的一下解决了，很快啊" class="headerlink" title="我啪的一下解决了，很快啊"></a>我啪的一下解决了，很快啊</h2><p>解决方法就是每个类中都重写了hashCode和equals方法。在Idea里可以自动生成这两个方法，超方便。</p>
+<p>那为什么重写equals方法也必须重写hashCode呢，首先有下面的规定：</p>
+<ol>
+<li>如果两个对象通过<code>equals</code>方法比较是相等的，那么<strong>要求</strong>这两个对象的<code>hashCode</code>方法返回的值也应该是相等的。</li>
+<li>如果两个对象通过<code>equals</code>方法比较是不同的，那么也<strong>不要求</strong>这两个对象的<code>hashCode</code>方法返回的值是不相同的。但是我们应该知道对于不同对象产生不同的哈希值对于哈希表(HashMap等等)能够提高性能。</li>
+</ol>
+<p>所以如果不重写hashcode方法，那么两个不同的对象equals时，hash值却不同，如果把对象用在map中作为键使用时就会出现上面的错误。</p>
 
     </div>
 
@@ -281,16 +286,19 @@
     
 
     <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%9D%91%EF%BC%8C%E8%AF%AD%E8%A8%80/" rel="tag"># 坑，语言</a>
+          </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
+                <a href="/2020/11/17/%E5%8A%A8%E8%A7%84/" rel="prev" title="动规动规">
+                  <i class="fa fa-chevron-left"></i> 动规动规
+                </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2019/05/12/%E8%B4%A6%E5%8D%95%E5%B0%8F%E9%A1%B9%E7%9B%AE/" rel="next" title="账单小项目">
-                  账单小项目 <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>

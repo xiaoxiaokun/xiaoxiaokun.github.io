@@ -161,13 +161,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -199,6 +199,99 @@
       
 
       
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/17/%E9%87%8D%E6%96%B0equals()%20%E5%92%8ChashCode()/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/11/17/%E9%87%8D%E6%96%B0equals()%20%E5%92%8ChashCode()/" class="post-title-link" itemprop="url">重写equals() 和hashCode()</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2020-11-17 19:41:05" itemprop="dateCreated datePublished" datetime="2020-11-17T19:41:05+08:00">2020-11-17</time>
+    </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-11-19 18:36:34" itemprop="dateModified" datetime="2020-11-19T18:36:34+08:00">2020-11-19</time>
+      </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="发生了甚么"><a href="#发生了甚么" class="headerlink" title="发生了甚么"></a>发生了甚么</h2><p>做项目时在构建函数调用图时明明把所有的结点和边信息都写入图中了，但在Echarts生成的图中结点间并没有边。</p>
+<p>构建的图使用到了4个类：</p>
+<ol>
+<li>classInfo 结点信息类、</li>
+<li>clsasNode 结点类，包含classInfo类</li>
+<li>classEdge 边类，包含了两个classNode类</li>
+<li>classGraph 图类，包含了所有结点类和边类</li>
+</ol>
+<h2 id="原来是这样"><a href="#原来是这样" class="headerlink" title="原来是这样"></a>原来是这样</h2><p>原因是将图片转为echarts所需要的json格式时使用了HashMap遍历添加了图中所有结点，之后在把结点和边信息存为json时使用了HashMap中的containsKey方法，containsKey方法中使用了equals和hashCode方法，没有重写这两个方法导致了containsKey在判断时认为两个值相等的不同对象并不相等。</p>
+<p>用上面的图举例子就是：</p>
+<ol>
+<li>声明一个 <code>HashMap&lt;classEdge, Integer&gt; map</code> </li>
+<li>声明一个classEdge变量<code>edge1 = new classEdge(classNode1, classNode2) </code>，并添加进map中 <code>map.put(edge1, 1)</code></li>
+<li>使用<code>map.containsKey(new classEdge(classNode1, classNode2))</code> 时结果为false，因为虽然边的两个node是相同的，但是因为没有重写equals和hashCode方法，这两个边被认为是不同的</li>
+</ol>
+<h2 id="我啪的一下解决了，很快啊"><a href="#我啪的一下解决了，很快啊" class="headerlink" title="我啪的一下解决了，很快啊"></a>我啪的一下解决了，很快啊</h2><p>解决方法就是每个类中都重写了hashCode和equals方法。在Idea里可以自动生成这两个方法，超方便。</p>
+<p>那为什么重写equals方法也必须重写hashCode呢，首先有下面的规定：</p>
+<ol>
+<li>如果两个对象通过<code>equals</code>方法比较是相等的，那么<strong>要求</strong>这两个对象的<code>hashCode</code>方法返回的值也应该是相等的。</li>
+<li>如果两个对象通过<code>equals</code>方法比较是不同的，那么也<strong>不要求</strong>这两个对象的<code>hashCode</code>方法返回的值是不相同的。但是我们应该知道对于不同对象产生不同的哈希值对于哈希表(HashMap等等)能够提高性能。</li>
+</ol>
+<p>所以如果不重写hashcode方法，那么两个不同的对象equals时，hash值却不同，如果把对象用在map中作为键使用时就会出现上面的错误。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
     
 
 
@@ -948,95 +1041,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/09/12/CSAPP%20blocking/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/24/CSAPP%CF%B5%CD%B3IO/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="suTrue">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/08/24/CSAPP%CF%B5%CD%B3IO/" class="post-title-link" itemprop="url">CSAPP系统I/O</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-08-24 10:34:38" itemprop="dateCreated datePublished" datetime="2019-08-24T10:34:38+08:00">2019-08-24</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>输入输出是在主存和外部设备（如硬盘，网络，终端）之间拷贝数据的过程，Unix将所有I/O设备都抽象为<strong>文件</strong>，输入输出被当作对相应文件的读和写来执行。</p>
-<h2 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h2><h3 id="什么是文件"><a href="#什么是文件" class="headerlink" title="什么是文件"></a>什么是文件</h3><p>Unix文件是一个m个字节的序列，系统将一切I/O设备（如硬件设备，终端，网络）都抽象为文件，再通过描述符（内核返回的非负整数）这个接口去操作，使所有设备的访问都是以文件的方式进行，优雅且统一。</p>
-<h3 id="文件的类型"><a href="#文件的类型" class="headerlink" title="文件的类型"></a>文件的类型</h3><ul>
-<li><p>普通文件</p>
-<p>一般来说需要区分出文本文件和二进制文件。文本文件只包含 ASCII 或 Unicode 字符。除此之外的都是二进制文件(对象文件, JPEG 图片, 等等)。对于内核来说其实并不能区分出个中的区别。文本文件就是一系列的文本行，每行以 <code>\n</code> 结尾，新的一行是 <code>0xa</code>，和 ASCII 码中的 line feed 字符(LF) 一样。不同系统用用判断一行结束的符号不同</p>
-</li>
-<li><p>目录</p>
-<p>目录文件包含其他文件的信息，目录包含一个链接(link)数组，并且每个目录至少包含两条记录：</p>
-<ul>
-<li><code>.</code>(dot) 当前目录</li>
-<li><code>..</code>(dot dot) 上一层目录</li>
-</ul>
-</li>
-<li><p>套接字</p>
-<p>一种通过网络与其他进程通信的文件</p>
-</li>
-</ul>
-<h3 id="对文件的操作"><a href="#对文件的操作" class="headerlink" title="对文件的操作"></a>对文件的操作</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/08/24/CSAPP%CF%B5%CD%B3IO/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

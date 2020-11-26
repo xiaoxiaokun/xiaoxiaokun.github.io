@@ -324,10 +324,16 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2020-11-17 11:34:58 / 修改时间：13:15:50" itemprop="dateCreated datePublished" datetime="2020-11-17T11:34:58+08:00">2020-11-17</time>
+      <time title="创建时间：2020-11-17 11:34:58" itemprop="dateCreated datePublished" datetime="2020-11-17T11:34:58+08:00">2020-11-17</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2020-11-26 10:44:14" itemprop="dateModified" datetime="2020-11-26T10:44:14+08:00">2020-11-26</time>
+      </span>
 
   
 </div>
@@ -343,15 +349,41 @@
 <p>使用DP有三个要求：最优子结构（把大问题分为多个小问题，只要最优解决小问题就可以最优解决大问题），子问题被重复求解（overlapped，重复了才能优化嘛），没有后效性（子问题的最优解不会在解决后面的较大问题时被改变）。</p>
 <p>获得状态转移方程是最难的一步，总结了一点点思路</p>
 <h3 id="1-遍历以求得的所有解"><a href="#1-遍历以求得的所有解" class="headerlink" title="1. 遍历以求得的所有解"></a>1. 遍历以求得的所有解</h3><p>得到某一种状态需要遍历前面所有已经得出的状态，即求 f[i] 需要遍历 f[1], f[2], …, f[i - 1]。139，813，312，300，410都是这样。</p>
+<p>还有312题戳破气球<code>f[i][j]</code>需要遍历 <code>f[i][k] 和 f[k][j]</code> 两个状态。</p>
 <h4 id="139、单词拆分"><a href="#139、单词拆分" class="headerlink" title="139、单词拆分"></a>139、单词拆分</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">wordBreak</span><span class="params">(String s, List&lt;String&gt; wordDict)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// f[i] 从第1个到第i个字符的子字符串能否被拆分</span></span><br><span class="line">    <span class="comment">// f[i] = (f[1]...f[k] &amp;&amp; dict.contains(s.substring(k, i)))   k &gt;= 0 &amp;&amp; k &lt; i</span></span><br><span class="line">    <span class="comment">// 时间复杂度：O(n^2)  空间复杂度：O(n)</span></span><br><span class="line"></span><br><span class="line">    HashSet&lt;String&gt; dict = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (String str : wordDict) &#123;</span><br><span class="line">      dict.add(str);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">boolean</span>[] f = <span class="keyword">new</span> <span class="keyword">boolean</span>[s.length() + <span class="number">1</span>];</span><br><span class="line">    f[<span class="number">0</span>] = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= s.length(); i++) &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; i; k++) &#123;				<span class="comment">//这里遍历所有可能解</span></span><br><span class="line">        <span class="keyword">if</span> (f[k] &amp;&amp; dict.contains(s.substring(k, i))) &#123;</span><br><span class="line">          f[i] = <span class="keyword">true</span>;</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> f[s.length()];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2020/11/17/%E5%8A%A8%E8%A7%84/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
+
+<p>873题一维数组无法表示状态，也需要二维来记录所有以i，j结尾的子序列的长度，并利用HashMap来进行记忆</p>
+<h3 id="2-状态机"><a href="#2-状态机" class="headerlink" title="2. 状态机"></a>2. 状态机</h3><p>在某一个时刻或位置会有几种不同的状态，不同状态间的转换有一些限制，用这些限制就可以写出状态转移方程。比如309、801题</p>
+<h4 id="309、存在冷却期的股票买卖"><a href="#309、存在冷却期的股票买卖" class="headerlink" title="309、存在冷却期的股票买卖"></a>309、存在冷却期的股票买卖</h4><p>在卖出后必须冷却一天才能继续买入，每天只能干三件事，买入、啥也不干、卖出。那么状态可以直接设为这3种情况吗？</p>
+<p>实际上不行，因为这里啥也不干包括了2种情况：手里持股啥也不干和不持股啥也不干。那分为四个状态呢？就可以进行计算了。这里还可以降维：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">f[i][0]  买入。     &#x3D; f[i - 1][2] - A[i]</span><br><span class="line">f[i][1]  持股啥也不干   &#x3D; max(f[i - 1][0], f[i - 1][1])</span><br><span class="line">f[i][2]  不持股啥也不干 &#x3D; max(f[i - 1][2], f[i - 1][3])</span><br><span class="line">f[i][3]  卖出。     &#x3D; max(f[i - 1][0], f[i - 1][1]) + A[i]</span><br></pre></td></tr></table></figure>
+
+<p>不过前两种状态实际上也可以合并为一个状态，那就是存在3种状态，持有、休息、卖出：</p>
+<img src="https://ae03.alicdn.com/kf/Hafbdbeb888e641f69f1dc317259d526cR.png" alt="image.png" style="zoom:33%;" />
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">f[i][0]  到第i天持有     &#x3D; max(f[i - 1][0], f[i - 1][1] - prices[i])</span><br><span class="line">f[i][1]  到第i天休息状态  &#x3D; max(f[i - 1][1], f[i - 1][2])</span><br><span class="line">f[i][2]  到第i天售出状态  &#x3D; f[i - 1][0] + prices[i]</span><br></pre></td></tr></table></figure>
+
+<p>（72题编辑距离中每一步有四种操作方式达到，这状态转移也是有点类似的哦）</p>
+<h3 id="3-问题转化"><a href="#3-问题转化" class="headerlink" title="3. 问题转化"></a>3. 问题转化</h3><p>比如576题，将(i, j) 位置上的球移出界的路径数可以转化为将界外的球移到 (i, j) 位置的路径数；</p>
+<p>416分割等和子集的题可以转为求和为是否存在和为 sum 一半的子序列</p>
+<h3 id="4-关于矩阵的"><a href="#4-关于矩阵的" class="headerlink" title="4. 关于矩阵的"></a>4. 关于矩阵的</h3><ol>
+<li>通过<code>dp[i][j] = dp[i][j - 1] + dp[i - 1][j] - dp[i - 1][j - 1] + mat[i -1][j -1];</code>先计算出所有左上角到 (i, j) 点的矩形区域的和</li>
+<li>然后可以快速得到任意指定矩形区域的和，区域 (x1, y1) 到 (x2, y2) 的和为 <code>dp[x2][y2] - dp[x2][y1 - 1] - dp[x1 - 1][y2] + dp[x1 - 1][y1 - 1];</code></li>
+</ol>
+<p>比如1292，1314题，在 n^2 时间内就可以得到所有区域的和了，否则时间复杂度将达到 n^4</p>
+<h3 id="5-空间压缩"><a href="#5-空间压缩" class="headerlink" title="5. 空间压缩"></a>5. 空间压缩</h3><p>很多题都可以进一步压缩空间复杂度，这种题大多数状态转移方程只需要用到前一层或后一层状态，所以可能需要一个额外的一维数组或者变量进行记录，比如121，416题等。322零钱兑换也是不错的。</p>
+<p>121: <code>f[i] = max(f[i - 1], A[i] - l[i])</code>  l[i] 表示前i天的最低价。 &gt;&gt;&gt;&gt;  <code>res = max(res, A[i] - lowest)</code>  用lowest代替 L 数组</p>
+<p>416: <code>f[i][j] = f[i - 1][j] || f[i - 1][j - A[i]]</code>   &gt;&gt;&gt;&gt;  <code>f[j] = f[j] || f[j - A[i]]</code> </p>
+<p><code>f[i][j] = f[i - 1][j]</code>     &gt;&gt;&gt;&gt;   <code>memo = f; memo[j] = f[j]; f = memo  </code> 声明一个memo数组，最后再全部赋值给f</p>
+<p><code>f[i][j] = f[i + 1][j - 1]</code>   这个i由i+1得到，所以要倒序遍历i  &gt;&gt;&gt;&gt;   <code>f[i] = max(f[i], f[i - 1])</code> ，但要记录前一个值，详细看下面516题</p>
+<p>516、最长回文字子串题就可以用到滚动数组进行压缩，滚动数组还可以进一步压缩为一个临时变量。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">longestPalindromeSubseq</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// f[i][j]   从第i个字符到第j个字符是否是回文字</span></span><br><span class="line">  <span class="comment">// f[i][j] = f[i + 1][j - 1]  if (s[i] == s[j])</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 滚动数组</span></span><br><span class="line">  <span class="keyword">int</span>[] f0 = <span class="keyword">new</span> <span class="keyword">int</span>[s.length() + <span class="number">1</span>];   <span class="comment">//状态压缩，f0[i]表示长度为l - 1的到第i个字符为止的字符串</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (s.equals(<span class="string">&quot;&quot;</span>)) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= s.length(); i++) f0[i] = <span class="number">1</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = s.length(); i &gt;= <span class="number">1</span>; i--) &#123;</span><br><span class="line">    <span class="keyword">int</span> pre = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt;= s.length(); j++) &#123;</span><br><span class="line">      <span class="keyword">int</span> temp = f0[j];</span><br><span class="line">      <span class="keyword">if</span> (s.charAt(i - <span class="number">1</span>) == s.charAt(j - <span class="number">1</span>)) &#123;</span><br><span class="line">        f0[j] = pre + <span class="number">2</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> f0[j] = Math.max(f0[j], f0[j - <span class="number">1</span>]);</span><br><span class="line">      pre = temp;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> f0[s.length()];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>486题赢家预测，状态转移方程是<code>f[i][j] = Math.max(nums[i - 1] - f[i + 1][j], nums[j - 1] - f[i][j - 1]); f[i][j]表示第i到j元素的先手比后手赢的最多分数</code>，这种写法没法降维了。不过把<code>f[i][j]</code>改为长度为 i，开始元素是j的子序列中先手比后手多的分数的话就可以降维了，<code>max(nums[j] - f[i - 1][j + 1], nums[j + i - 1] - f[i - 1][j]);</code> &gt;&gt;&gt;&gt;  <code>f[j] = max(nums[j] - f[j + 1], nums[j + i - 1] - f[j])</code></p>
+<h3 id="6-Other"><a href="#6-Other" class="headerlink" title="6. Other"></a>6. Other</h3><p>还有些题连状态方程都很难想，比如486猜赢家，<code>f[i][j]</code>表示从i到j的子序列，先手和后手的分差。啊凭经验与运气了。</p>
+<p>有时还需要一个HashMap记录之前的状态来快速获取结果，如823，873。</p>
+<p>那就先写这么多，之后有新的想法再更新，那我现在走吧。我是郭富城！</p>
+
       
     </div>
 

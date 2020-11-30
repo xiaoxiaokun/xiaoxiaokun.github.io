@@ -161,7 +161,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-count">24</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -199,6 +199,87 @@
       
 
       
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/30/%E8%83%8C%E5%8C%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/11/30/%E8%83%8C%E5%8C%85/" class="post-title-link" itemprop="url">背包问题</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2020-11-30 22:31:33 / 修改时间：22:34:59" itemprop="dateCreated datePublished" datetime="2020-11-30T22:31:33+08:00">2020-11-30</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>还是挺常见的问题，感觉属于动态规划里的内容，但这部分东西也不少，而且很有规律，所以单独作为一篇</p>
+<h2 id="背包是啥"><a href="#背包是啥" class="headerlink" title="背包是啥"></a>背包是啥</h2><p>先介绍基础的背包问题，01背包，完全背包和多重背包。</p>
+<h3 id="1-01背包"><a href="#1-01背包" class="headerlink" title="1. 01背包"></a>1. 01背包</h3><p><em>问题：有 N 件物品和一个容量为 V 的背包。放入第 i 件物品耗费的费用是 C i ，得到的价值是 W i 。求解将哪些物品装入背包可使价值总和最大。</em></p>
+<p>每种物品只有选或不选两种情况，所以如果是暴力法时间复杂度也就是2^N，使用动态规划可以缩短至N * V。<code>f[i][j]</code>定义为前i个物品装入容量为j的背包的最大价值，<code>f[i][j] = max(f[i - 1][j], f[i - 1][j - C[i]] + W[i])</code>。可以降维，但是 j 需要倒序循环，为了不影响 j 之后的位置的计算。 </p>
+<p>有很多DP可以转为这样的01背包问题，比如416题，可以转化为找到数组中是否存在和为target的子序列。</p>
+<h3 id="2-完全背包"><a href="#2-完全背包" class="headerlink" title="2. 完全背包"></a>2. 完全背包</h3><p><em>问题：有 N 种物品和一个容量为 V 的背包，每种物品都有无限件可用。放入第 i 种物品的费用是 C i ，价值是 W i 。求解：将哪些物品装入背包，可使这些物品的耗费的费用总 和不超过背包容量，且价值总和最大。</em></p>
+<p>每种物品虽然是无限个，但不是就有无限种情况，因为有容量的限制，所以每个物品的情况有k种，满足k * C i &lt; V，<code>f[i][j]</code>定义和之前相同，<code>f[i][j] = max(f[i - 1][j - k*C[i]] + k*W[i])</code>。其实可以把完全背包转化为01背包，即每个物品的多次选择看作对多个物品的01选择，比如 i物品最多只能选择7个，那么可以看作有7个 i 物品，然后对其进行01选择。</p>
+<p>完全背包有三重循环，但可以将其优化为二重循环，完全背包的特点恰是每种物品可选无限件，所以在考虑<strong>加选一件第 i 种物品</strong>这种策略时， 正需要一个可能已选入第 i 种物品的子结果<code>f[i][j - C[i]]</code>。所以状态转移方程可以转化为<code>f[i][j] = max(f[i - 1][j], f[i][j - C[i]] + W[i])</code>，最后这个方程同样也可以降维。</p>
+<p>322题凑硬币就是很经典的完全背包问题。377也是，但是包含了组合排列，解法会特殊一点。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/11/30/%E8%83%8C%E5%8C%85/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
     
 
 
@@ -987,92 +1068,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/09/19/%E5%BC%95%E7%94%A8%E7%9A%84%E5%9D%91/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/12/CSAPP%20blocking/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="suTrue">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/09/12/CSAPP%20blocking/" class="post-title-link" itemprop="url">cache lab 和分块（blocking)</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-09-12 22:41:12" itemprop="dateCreated datePublished" datetime="2019-09-12T22:41:12+08:00">2019-09-12</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>做完 cache lab 后做的总结，先简单说一下cache和块</p>
-<h2 id="cache"><a href="#cache" class="headerlink" title="cache"></a>cache</h2><h3 id="是什么："><a href="#是什么：" class="headerlink" title="是什么："></a>是什么：</h3><p>高速缓存存储器(Cache Memory)是 CPU 缓存系统甚至是金字塔式存储体系中最有代表性的缓存机制，它也与虚拟存储器有着很深的关联。</p>
-<p>三个关键组成部分（注意区分大小写）：</p>
-<ul>
-<li>S 表示集合(set)数量</li>
-<li>E 表示数据行(line)的数量</li>
-<li>B 表示每个缓存块(block)保存的字节数目</li>
-</ul>
-<p>存放数据的空间大小为：C=S×E×B</p>
-<p>一些相关的介绍可以参考之前写的 <a target="_blank" rel="noopener" href="https://xiaoxiaokun.github.io/2019/08/21/%E7%BC%96%E5%86%99%E9%AB%98%E9%80%9F%E7%BC%93%E5%86%B2%E5%8F%8B%E5%A5%BD%E7%9A%84%E4%BB%A3%E7%A0%81/">编写高速缓冲友好的代码</a> </p>
-<h2 id="分块"><a href="#分块" class="headerlink" title="分块"></a>分块</h2><h3 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h3><ul>
-<li>在内循环中提高局部性</li>
-<li>将数据结构组织成很多块，载入L1 cache</li>
-<li>用完一个后再载入下一个块</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/09/12/CSAPP%20blocking/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

@@ -231,10 +231,16 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2020-11-30 22:31:33 / 修改时间：22:34:59" itemprop="dateCreated datePublished" datetime="2020-11-30T22:31:33+08:00">2020-11-30</time>
+      <time title="创建时间：2020-11-30 22:31:33" itemprop="dateCreated datePublished" datetime="2020-11-30T22:31:33+08:00">2020-11-30</time>
     </span>
+      <span class="post-meta-item">
+        <span class="post-meta-item-icon">
+          <i class="far fa-calendar-check"></i>
+        </span>
+        <span class="post-meta-item-text">更新于</span>
+        <time title="修改时间：2021-03-11 12:06:21" itemprop="dateModified" datetime="2021-03-11T12:06:21+08:00">2021-03-11</time>
+      </span>
 
   
 </div>
@@ -249,11 +255,26 @@
           <p>还是挺常见的问题，感觉属于动态规划里的内容，但这部分东西也不少，而且很有规律，所以单独作为一篇</p>
 <h2 id="背包是啥"><a href="#背包是啥" class="headerlink" title="背包是啥"></a>背包是啥</h2><p>先介绍基础的背包问题，01背包，完全背包和多重背包。</p>
 <h3 id="1-01背包"><a href="#1-01背包" class="headerlink" title="1. 01背包"></a>1. 01背包</h3><p><em>问题：有 N 件物品和一个容量为 V 的背包。放入第 i 件物品耗费的费用是 C i ，得到的价值是 W i 。求解将哪些物品装入背包可使价值总和最大。</em></p>
-<p>每种物品只有选或不选两种情况，所以如果是暴力法时间复杂度也就是2^N，使用动态规划可以缩短至N * V。<code>f[i][j]</code>定义为前i个物品装入容量为j的背包的最大价值，<code>f[i][j] = max(f[i - 1][j], f[i - 1][j - C[i]] + W[i])</code>。可以降维，但是 j 需要倒序循环，为了不影响 j 之后的位置的计算。 </p>
+<p>每种物品只有选或不选两种情况，所以如果是暴力法时间复杂度也就是2^N，使用动态规划可以缩短至N * V。<code>f[i][j]</code>定义为前i个物品装入容量为j的背包的最大价值，<code>f[i][j] = max(f[i - 1][j], f[i - 1][j - C[i]] + W[i])</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">  	<span class="keyword">for</span> (<span class="keyword">int</span> j = C[i]; j &lt;= V; j++) &#123;</span><br><span class="line">      	f[i][j] = Math.max(f[i - <span class="number">1</span>][j], f[i - <span class="number">1</span>][j - C[i]] + W[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>可以降维，但是 j 需要倒序循环，为了不影响 j 之后的位置的计算。 因为<code>f[j]</code> 的计算实际要用到 <code>f[i-1][j]</code> 和 <code>f[i-1][j-C[i]]</code>，就是上一次循环的<code>f[j]</code> 和 <code>f[j-C[i]]</code>，如果是正序<code>f[j-C[i]]</code> 在本次循环中就已经被改变了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> j = V; j &gt;= C[i]; j--) &#123;</span><br><span class="line">        f[j] = Math.max(f[j], f[j - C[i]] + W[i]);</span><br><span class="line">    &#125;		</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>有很多DP可以转为这样的01背包问题，比如416题，可以转化为找到数组中是否存在和为target的子序列。</p>
 <h3 id="2-完全背包"><a href="#2-完全背包" class="headerlink" title="2. 完全背包"></a>2. 完全背包</h3><p><em>问题：有 N 种物品和一个容量为 V 的背包，每种物品都有无限件可用。放入第 i 种物品的费用是 C i ，价值是 W i 。求解：将哪些物品装入背包，可使这些物品的耗费的费用总 和不超过背包容量，且价值总和最大。</em></p>
 <p>每种物品虽然是无限个，但不是就有无限种情况，因为有容量的限制，所以每个物品的情况有k种，满足k * C i &lt; V，<code>f[i][j]</code>定义和之前相同，<code>f[i][j] = max(f[i - 1][j - k*C[i]] + k*W[i])</code>。其实可以把完全背包转化为01背包，即每个物品的多次选择看作对多个物品的01选择，比如 i物品最多只能选择7个，那么可以看作有7个 i 物品，然后对其进行01选择。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">  	<span class="keyword">for</span> (<span class="keyword">int</span> j = C[i]; j &lt;= V; j++) &#123;</span><br><span class="line">      	<span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k * C[i] &lt;= j; k++) &#123;</span><br><span class="line">          	f[i][j] = Math.max(f[i][j], f[i - <span class="number">1</span>][j - k * C[i]] + k * W[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
 <p>完全背包有三重循环，但可以将其优化为二重循环，完全背包的特点恰是每种物品可选无限件，所以在考虑<strong>加选一件第 i 种物品</strong>这种策略时， 正需要一个可能已选入第 i 种物品的子结果<code>f[i][j - C[i]]</code>。所以状态转移方程可以转化为<code>f[i][j] = max(f[i - 1][j], f[i][j - C[i]] + W[i])</code>，最后这个方程同样也可以降维。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= N; i++) &#123;</span><br><span class="line">  	<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">1</span>; j &lt;= V; j++) &#123;</span><br><span class="line">      	f[i][j] = Math.max(f[i - <span class="number">1</span>][j], f[i][j - C[i]] + W[i]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
 <p>322题凑硬币就是很经典的完全背包问题。377也是，但是包含了组合排列，解法会特殊一点。</p>
           <!--noindex-->
             <div class="post-button">
@@ -1134,7 +1155,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

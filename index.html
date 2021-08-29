@@ -24,12 +24,12 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Muse","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
   </script>
 
-  <meta name="description" content="wake the fuck up">
+  <meta name="description" content="wake the fuck up, samurai">
 <meta property="og:type" content="website">
 <meta property="og:title" content="suTrue">
 <meta property="og:url" content="http://yoursite.com/index.html">
 <meta property="og:site_name" content="suTrue">
-<meta property="og:description" content="wake the fuck up">
+<meta property="og:description" content="wake the fuck up, samurai">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="小小KUN">
 <meta name="twitter:card" content="summary">
@@ -155,19 +155,19 @@
         <section class="site-overview-wrap sidebar-panel">
           <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
   <p class="site-author-name" itemprop="name">小小KUN</p>
-  <div class="site-description" itemprop="description">wake the fuck up</div>
+  <div class="site-description" itemprop="description">wake the fuck up, samurai</div>
 </div>
 <div class="site-state-wrap site-overview-item animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-count">24</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -207,12 +207,123 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/08/29/Java%E6%95%B4%E5%9E%8B%E6%BA%A2%E5%87%BA%E7%9A%84%E4%B8%80%E7%82%B9%E6%96%B0%E6%94%B6%E8%8E%B7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up, samurai">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/08/29/Java%E6%95%B4%E5%9E%8B%E6%BA%A2%E5%87%BA%E7%9A%84%E4%B8%80%E7%82%B9%E6%96%B0%E6%94%B6%E8%8E%B7/" class="post-title-link" itemprop="url">Java整型溢出的一点新收获</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-08-29 09:04:46 / 修改时间：19:18:14" itemprop="dateCreated datePublished" datetime="2021-08-29T09:04:46+08:00">2021-08-29</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>5844、数组元素的最小非零乘积</p>
+<blockquote>
+<p>给你一个正整数 p 。你有一个下标从 1 开始的数组 nums ，这个数组包含范围 [1, 2p - 1] 内所有整数的二进制形式（两端都 包含）。你可以进行以下操作任意次：从 nums 中选择两个元素 x 和 y  。<br>选择 x 中的一位与 y 对应位置的位交换。对应位置指的是两个整数 相同位置 的二进制位。比方说，如果 x = 1101 且 y = 0011 ，交换右边数起第 2 位后，我们得到 x = 1111 和 y = 0001 。请你算出进行以上操作 任意次 以后，nums 能得到的 最小非零 乘积。将乘积对 109 + 7 取余 后返回。注意：答案应为取余 之前 的最小值。</p>
+</blockquote>
+<p>其实很快就能找到规律，但是这题问题就在于，<strong>求解过程中数字溢出，需要在每一处可能溢出的地方进行取余操作，同时配合记忆化递归进行快速幂求解。</strong></p>
+<p>下面是最终的代码，可以看到在很多处都进行了取余操作，因为求2^60级别的乘法中稍稍不注意就会Long型溢出了。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    public int <span class="function"><span class="title">minNonZeroProduct</span>(<span class="params">int p</span>)</span> &#123;</span><br><span class="line">        <span class="comment">// int的最大值是 2^31 - 1</span></span><br><span class="line">        <span class="keyword">if</span> (p == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        long r = (long)<span class="built_in">Math</span>.pow(<span class="number">2</span>, p) - <span class="number">1</span>;</span><br><span class="line">        </span><br><span class="line">        long res = r % mod;    <span class="comment">//取余</span></span><br><span class="line">        res *= getPow(r - <span class="number">1</span>, r / <span class="number">2</span>);</span><br><span class="line">        res %= mod;    <span class="comment">//取余</span></span><br><span class="line">        <span class="keyword">return</span> (int)res;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    long mod = <span class="number">1000000007</span>;</span><br><span class="line">    HashMap&lt;Long, Long&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    public long <span class="function"><span class="title">getPow</span>(<span class="params">long num, long multi</span>)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (multi == <span class="number">1</span>) <span class="keyword">return</span> num;</span><br><span class="line">        <span class="keyword">if</span> (map.containsKey(multi)) <span class="keyword">return</span> map.get(multi);</span><br><span class="line">        </span><br><span class="line">        long res = getPow(num, multi / <span class="number">2</span>) % mod;   <span class="comment">//取余</span></span><br><span class="line">        res *= getPow(num, multi / <span class="number">2</span>) % mod;    <span class="comment">//取余</span></span><br><span class="line">        res %= mod;    <span class="comment">//取余</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (multi % <span class="number">2</span> == <span class="number">1</span>) &#123;</span><br><span class="line">            res *= num % mod;     <span class="comment">//取余</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        res %= mod;    <span class="comment">//取余</span></span><br><span class="line">        <span class="comment">// System.out.println(res);</span></span><br><span class="line">        map.put(multi, res);</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>还有一个问题在于</strong>：</p>
+<p> <code>long r = (int)Math.pow(2, p) - 1;</code> 这句当p等于31时，按理说2 ^ 31转化为int时会溢出，结果应该是 -2147483648 - 1 = 2147483647，但是结果却是2147483646；当我在本地IDE进行<code>(int)Math.pow(2, 31)</code> 这个运算时，得到的结果也是2147483647，这就有点匪夷所思了。</p>
+<p>初步排除了无符号的原因，因为如果是无符号，那最大值应该是2 ^ 32 - 1，那么Math.pow(2, 31) 应该得到的是2147483648。</p>
+<p>想想这可能是JDK内部实现时进行的什么改变，下面是Java官方文档对于类型转换的解释：</p>
+<p><strong>Narrowing Primitive Conversion</strong></p>
+<p>22 specific conversions on primitive types are called the <em>narrowing primitive conversions</em>:</p>
+<ul>
+<li><code>short</code> to <code>byte</code> or <code>char</code></li>
+<li><code>char</code> to <code>byte</code> or <code>short</code></li>
+<li><code>int</code> to <code>byte</code>, <code>short</code>, or <code>char</code></li>
+<li><code>long</code> to <code>byte</code>, <code>short</code>, <code>char</code>, or <code>int</code></li>
+<li><code>float</code> to <code>byte</code>, <code>short</code>, <code>char</code>, <code>int</code>, or <code>long</code></li>
+<li><code>double</code> to <code>byte</code>, <code>short</code>, <code>char</code>, <code>int</code>, <code>long</code>, or <code>float</code></li>
+</ul>
+<p>A narrowing primitive conversion may lose information about the overall magnitude of a numeric value and may also lose precision and range.</p>
+<p>A narrowing primitive conversion from <code>double</code> to <code>float</code> is governed by the IEEE 754 rounding rules (<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-4.html#jls-4.2.4">§4.2.4</a>). This conversion can lose precision, but also lose range, resulting in a <code>float</code> zero from a nonzero <code>double</code> and a <code>float</code> infinity from a finite <code>double</code>. A <code>double</code> NaN is converted to a <code>float</code> NaN and a <code>double</code> infinity is converted to the same-signed <code>float</code> infinity.</p>
+<p>A narrowing conversion of a signed integer to an integral type T simply discards all but the <em>n</em> lowest order bits, where <em>n</em> is the number of bits used to represent type T. In addition to a possible loss of information about the magnitude of the numeric value, this may cause the sign of the resulting value to differ from the sign of the input value.</p>
+<p>A narrowing conversion of a <code>char</code> to an integral type T likewise simply discards all but the <em>n</em> lowest order bits, where <em>n</em> is the number of bits used to represent type T. In addition to a possible loss of information about the magnitude of the numeric value, this may cause the resulting value to be a negative number, even though chars represent 16-bit unsigned integer values.</p>
+<p>A narrowing conversion of a floating-point number to an integral type T takes two steps:</p>
+<ol>
+<li>In the first step, the floating-point number is converted either to a <code>long</code>, if T is <code>long</code>, or to an <code>int</code>, if T is <code>byte</code>, <code>short</code>, <code>char</code>, or <code>int</code>, as follows:<ol>
+<li>If the floating-point number is NaN (<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-4.html#jls-4.2.3">§4.2.3</a>), the result of the first step of the conversion is an <code>int</code> or <code>long</code> <code>0</code>.</li>
+<li>Otherwise, if the floating-point number is <strong>not an infinity</strong>, the floating-point value is rounded to an integer value <code>V</code>, rounding toward zero using IEEE 754 round-toward-zero mode (<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-4.html#jls-4.2.3">§4.2.3</a>). Then there are two cases:<ol>
+<li>If T is <code>long</code>, and this integer value can be represented as a <code>long</code>, then the result of the first step is the <code>long</code> value <code>V</code>.</li>
+<li>Otherwise, if this integer value can be represented as an <code>int</code>, then the result of the first step is the <code>int</code> value <code>V</code>.</li>
+</ol>
+</li>
+<li>Otherwise, one of the following two cases must be true:<ol>
+<li>The value must be too small (a negative value of large magnitude or negative infinity), and the result of the first step is the smallest representable value of type <code>int</code> or <code>long</code>.</li>
+<li><strong>The value must be too large (a positive value of large magnitude or positive infinity), and the result of the first step is the largest representable value of type <code>int</code> or <code>long</code>.</strong></li>
+</ol>
+</li>
+</ol>
+</li>
+<li>In the second step:<br> ◦ If T is <code>int</code> or <code>long</code>, the result of the conversion is the result of the first step.<br> ◦ If T is <code>byte</code>, <code>char</code>, or <code>short</code>, the result of the conversion is the result of a narrowing conversion to type T (<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html#jls-5.1.3">§5.1.3</a>) of the result of the first step.</li>
+</ol>
+<p>加粗的地方就是上面这种情况，从double转为int型中的第3中情况，当浮点数的值是转为后的数据类型的infinity时，如果超过负极值，就转为MIN_VALUE，如果超过正极值，就转为MAX_VALUE;</p>
+<p>所以并不是所有的情况都会溢出。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/30/%E8%83%8C%E5%8C%85/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
+      <meta itemprop="description" content="wake the fuck up, samurai">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -311,7 +422,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
+      <meta itemprop="description" content="wake the fuck up, samurai">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -404,7 +515,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
+      <meta itemprop="description" content="wake the fuck up, samurai">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -513,7 +624,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
+      <meta itemprop="description" content="wake the fuck up, samurai">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -600,7 +711,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
+      <meta itemprop="description" content="wake the fuck up, samurai">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -691,7 +802,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
+      <meta itemprop="description" content="wake the fuck up, samurai">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -782,7 +893,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
+      <meta itemprop="description" content="wake the fuck up, samurai">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -884,7 +995,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
+      <meta itemprop="description" content="wake the fuck up, samurai">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -966,7 +1077,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
+      <meta itemprop="description" content="wake the fuck up, samurai">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -1011,81 +1122,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/09/21/CSAPP%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/19/%E5%BC%95%E7%94%A8%E7%9A%84%E5%9D%91/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="suTrue">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/09/19/%E5%BC%95%E7%94%A8%E7%9A%84%E5%9D%91/" class="post-title-link" itemprop="url">List引用的坑</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-09-19 13:50:22" itemprop="dateCreated datePublished" datetime="2019-09-19T13:50:22+08:00">2019-09-19</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>做39. combinationSum时发现的问题，第一次写的答案如下</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> List&lt;List&lt;Integer&gt;&gt; ret = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">combinationSum</span><span class="params">(<span class="keyword">int</span>[] candidates, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    List&lt;Integer&gt; oneSolve = <span class="keyword">new</span> ArrayList&lt;&gt;();   <span class="comment">//问题在这里1</span></span><br><span class="line">    help(candidates, target, oneSolve, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">help</span><span class="params">(<span class="keyword">int</span>[] candidates, <span class="keyword">int</span> target, List&lt;Integer&gt; oneSolve, <span class="keyword">int</span> sum)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (sum == target)&#123;</span><br><span class="line">        ret.add(oneSolve);   <span class="comment">//和这里2</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; candidates.length; i++) &#123;</span><br><span class="line">        <span class="keyword">int</span> temp = candidates[i];</span><br><span class="line">        <span class="keyword">if</span> (sum + temp &lt;= target)&#123;</span><br><span class="line">            oneSolve.add(temp);</span><br><span class="line">            help(candidates, target, oneSolve, sum+temp);</span><br><span class="line">            oneSolve.remove(oneSolve.size()-<span class="number">1</span>);   <span class="comment">//这里3</span></span><br><span class="line">        &#125;<span class="keyword">else</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>最后ret 得到的结果为空值，但通过 2 中每次也都正确添加了oneSolve 的列表</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/09/19/%E5%BC%95%E7%94%A8%E7%9A%84%E5%9D%91/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>

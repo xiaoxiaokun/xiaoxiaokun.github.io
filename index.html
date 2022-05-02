@@ -161,13 +161,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -199,6 +199,114 @@
       
 
       
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/05/02/Thrift/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="小小KUN">
+      <meta itemprop="description" content="wake the fuck up, samurai">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="suTrue">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/02/Thrift/" class="post-title-link" itemprop="url">Thrift学习笔记</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-05-02 12:08:30 / 修改时间：23:58:51" itemprop="dateCreated datePublished" datetime="2022-05-02T12:08:30+08:00">2022-05-02</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h2><p>Thrift是一个跨语言的RPC框架，它可以通过Thrift的IDL（接口定义语言）来描述接口函数及数据类型，编译后可以自动生成服务端的框架代码。</p>
+<p>RPC框架可以分为服务治理和跨语言调用两大类型。前者一般和语言耦合度高，且提供了丰富的功能（负载均衡，服务注册与发现等），比如Java的Dubbo框架。而后者主要解决不同语言的服务间的调用问题，没有太多花哨的功能，比如gRPC，Thrift。</p>
+<p><strong>优缺点</strong></p>
+<p>优点是可以跨语言使用，性能优秀，自动生成服务端代码，使用起来简单方便。</p>
+<p>缺点是没有动态特性。</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>Thrift是一种C/S的架构体系.在最上层是用户自行实现的业务逻辑代码。下层是由Thrift编译器自动生成的代码，主要用于结构化数据的解析，发送和接收。<br><img src="https://s3.bmp.ovh/imgs/2022/05/02/d8700e1ca0afcd48.png"></p>
+<p><strong>Transport:</strong></p>
+<p>为从网络进行读写提供了简单的抽象。负责以字节流方式接收和发送消息体，不关注是什么数据类型。底层IO负责实际的数据传输，包括socket、文件和压缩数据流等。它解耦了上层部分（如序列化）与数据的传输。</p>
+<p><strong>Protocol：</strong></p>
+<p>TProtocol是用于数据类型解析的，即序列化和反序列化，将结构化数据转化为字节流给TTransport进行传输。</p>
+<p><strong>Processor:</strong></p>
+<p>从输入流中读入数据，然后委托给处理代码进行处理（自己编写），最后写到输出流中。输入、输出流由下层的Protocal对象提供，接口非常简单：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">TProcessor</span> </span>&#123;</span><br><span class="line">    <span class="function">bool <span class="title">process</span><span class="params">(TProtocol in, TProtocol out)</span> <span class="keyword">throws</span> TException</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Server：</strong></p>
+<p>整合了上面所有的功能：</p>
+<ul>
+<li>Create a transport</li>
+<li>Create input/output protocols for the transport</li>
+<li>Create a processor based on the input/output protocols</li>
+<li>Wait for incoming connections and hand them off to the processor</li>
+</ul>
+<h2 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h2><p>我们使用Thrift实现一个匹配系统，客户端调用远程服务器将用户两两间进行匹配，比如玩各种1V1游戏时，将段位相似的玩家匹配到一起。客户端使用Python，服务端使用Java。</p>
+<p>源码在 <a target="_blank" rel="noopener" href="https://github.com/xiaoxiaokun/ThriftDemo%E3%80%82">https://github.com/xiaoxiaokun/ThriftDemo。</a></p>
+<h3 id="定义服务器接口"><a href="#定义服务器接口" class="headerlink" title="定义服务器接口"></a>定义服务器接口</h3><p>使用thrift定义的类型写一个thrift文件，再使用 <code>thrift -r --gen &lt;language&gt; &lt;thrift file&gt;</code> 自动生成客户端和服务端代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">namespace java match</span><br><span class="line"></span><br><span class="line">struct Player</span><br><span class="line">&#123;</span><br><span class="line">    <span class="number">1</span>: i32 id,</span><br><span class="line">    <span class="number">2</span>: string name,</span><br><span class="line">    <span class="number">3</span>: i32 score</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">service Match &#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * A method definition looks like C code. It has a return type, arguments,</span></span><br><span class="line"><span class="comment">   * and optionally a list of exceptions that it may throw. Note that argument</span></span><br><span class="line"><span class="comment">   * lists and exception lists are specified using the exact same syntax as</span></span><br><span class="line"><span class="comment">   * field lists in struct or exception definitions.</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line"></span><br><span class="line">   <span class="function">i32 <span class="title">add</span><span class="params">(<span class="number">1</span>:i32 id, <span class="number">2</span>:string name, <span class="number">3</span>:i32 score)</span>,</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">   i32 <span class="title">remove</span><span class="params">(<span class="number">1</span>:i32 id, <span class="number">2</span>:string name)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>使用命令生成的源码主要有两个文件，一个文件封装thrift中定义的接口方法，一个文件封装定义的类型。我们只需要在服务端实现该接口，在客户端调用该接口即可。</p>
+<h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a><strong>客户端</strong></h3><p>使用Python编写，用上述命令生成Python源码，主要得到 <a target="_blank" rel="noopener" href="http://得到ttypes.py/"></a>ttype.py 和 Math.py 两个文件。我们新建一个client.py文件来编写客户端的操作，先获取一个连接服务器的客户端对象，该对象中有在Thrift中写的接口方法，再直接调用即可：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pydoc <span class="keyword">import</span> cli</span><br><span class="line"><span class="keyword">from</span> sys <span class="keyword">import</span> stdin</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> match <span class="keyword">import</span> Match</span><br><span class="line"><span class="keyword">from</span> match.ttypes <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> thrift <span class="keyword">import</span> Thrift</span><br><span class="line"><span class="keyword">from</span> thrift.transport <span class="keyword">import</span> TSocket</span><br><span class="line"><span class="keyword">from</span> thrift.transport <span class="keyword">import</span> TTransport</span><br><span class="line"><span class="keyword">from</span> thrift.protocol <span class="keyword">import</span> TBinaryProtocol</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">operate</span>(<span class="params">op, <span class="built_in">id</span>, username, score</span>):</span></span><br><span class="line">    <span class="comment"># Make socket</span></span><br><span class="line">    transport = TSocket.TSocket(<span class="string">&#x27;localhost&#x27;</span>, <span class="number">9090</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Buffering is critical. Raw sockets are very slow</span></span><br><span class="line">    transport = TTransport.TBufferedTransport(transport)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Wrap in a protocol</span></span><br><span class="line">    protocol = TBinaryProtocol.TBinaryProtocol(transport)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Create a client to use the protocol encoder</span></span><br><span class="line">    client = Match.Client(protocol)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Connect!</span></span><br><span class="line">    transport.<span class="built_in">open</span>()</span><br><span class="line"></span><br><span class="line">    print(op)</span><br><span class="line">    <span class="keyword">if</span> op == <span class="string">&#x27;add&#x27;</span>:</span><br><span class="line">        client.add(<span class="built_in">id</span>, username, score)</span><br><span class="line">    <span class="keyword">elif</span> op == <span class="string">&#x27;remove&#x27;</span>:</span><br><span class="line">        client.remove(<span class="built_in">id</span>, username)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Close!</span></span><br><span class="line">    transport.close()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        line = stdin.readline()</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> line:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        line = line.strip()</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> line:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        op, <span class="built_in">id</span>, username, score = line.split()</span><br><span class="line">        operate(op, <span class="built_in">int</span>(<span class="built_in">id</span>), username, <span class="built_in">int</span>(score))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<h3 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a><strong>服务端</strong></h3><p>用Java编写，生成源码后得到 Match.java 和 Player.java 文件，和生成的Python源码类似。</p>
+<p>Match主要提供了Iface的接口，我们只要实现其中的add和remove方法即可，其余的创建Transport、创建Protocol、创建Server只需要调用Thrift提供的现成的实现类就好，而且Thrift对每一层的接口都提供了多种实现，用户可以根据需要选择合适的实现类，比如Server层提供了单线程和多线程实现，处理器也提供了同步和异步的实现。</p>
+<p>创建一个 MatchServerHandle 类来实现接口中的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MatchServerHandle</span> <span class="keyword">implements</span> <span class="title">Match</span>.<span class="title">Iface</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> id, String name, <span class="keyword">int</span> score)</span> </span>&#123;</span><br><span class="line">		log.info(<span class="string">&quot;add...&quot;</span>);</span><br><span class="line">		MatchServer.Task task = <span class="keyword">new</span> MatchServer.Task();</span><br><span class="line">		task.player = <span class="keyword">new</span> Player(id, name, score);</span><br><span class="line">		task.opType = <span class="string">&quot;add&quot;</span>;</span><br><span class="line">		<span class="keyword">synchronized</span> (MatchServer.taskQueue) &#123;</span><br><span class="line">			MatchServer.taskQueue.add(task);</span><br><span class="line">			MatchServer.taskQueue.notify();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">remove</span><span class="params">(<span class="keyword">int</span> id, String name)</span> </span>&#123;</span><br><span class="line">		log.info(<span class="string">&quot;remove...&quot;</span>);</span><br><span class="line">		MatchServer.Task task = <span class="keyword">new</span> MatchServer.Task();</span><br><span class="line">		task.player = <span class="keyword">new</span> Player(id, name);</span><br><span class="line">		task.opType = <span class="string">&quot;remove&quot;</span>;</span><br><span class="line">		<span class="keyword">synchronized</span> (MatchServer.taskQueue) &#123;</span><br><span class="line">			MatchServer.taskQueue.add(task);</span><br><span class="line">			MatchServer.taskQueue.notify();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>创建一个服务端的启动类，负责监听客户端请求，并创建添加、移除玩家的任务：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MatchServer</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> MatchServerHandle handler;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> Match.Processor&lt;MatchServerHandle&gt; processor;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> MatchPool pool;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Task</span> </span>&#123;</span><br><span class="line">		Player player;</span><br><span class="line">		String opType;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">static</span> <span class="keyword">final</span> Queue&lt;Task&gt; taskQueue = <span class="keyword">new</span> ConcurrentLinkedQueue&lt;&gt;();</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> TException </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			handler = <span class="keyword">new</span> MatchServerHandle();</span><br><span class="line">			processor = <span class="keyword">new</span> Match.Processor&lt;&gt;(handler);</span><br><span class="line">			pool = <span class="keyword">new</span> MatchPool();</span><br><span class="line"></span><br><span class="line">			TServerTransport serverTransport = <span class="keyword">new</span> TServerSocket(<span class="number">9090</span>);</span><br><span class="line">			TServer server = <span class="keyword">new</span> TSimpleServer(<span class="keyword">new</span> TThreadPoolServer.Args(serverTransport).processor(processor));</span><br><span class="line">			log.info(<span class="string">&quot;Match Server Starting...&quot;</span>);</span><br><span class="line"></span><br><span class="line">			Runnable createTask = MatchServer::createTask;</span><br><span class="line">			<span class="keyword">new</span> Thread(createTask, <span class="string">&quot;crtTaskTread&quot;</span>).start();</span><br><span class="line"></span><br><span class="line">			server.serve();</span><br><span class="line"></span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception x) &#123;</span><br><span class="line">			x.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 消费任务，进行添加、删除、匹配用户等操作</span></span><br><span class="line"><span class="comment">	 *</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">createTask</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">			<span class="keyword">synchronized</span> (taskQueue) &#123;</span><br><span class="line">				<span class="keyword">if</span> (taskQueue.isEmpty()) &#123;</span><br><span class="line">					<span class="keyword">try</span> &#123;</span><br><span class="line">						taskQueue.wait();</span><br><span class="line">					&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">						e.printStackTrace();</span><br><span class="line">						<span class="keyword">return</span>;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					<span class="comment">// 创建add任务或remove任务</span></span><br><span class="line">					Task t = taskQueue.poll();</span><br><span class="line">					<span class="keyword">if</span> (<span class="string">&quot;add&quot;</span>.equals(t.opType)) &#123;</span><br><span class="line">						pool.add(t.player);</span><br><span class="line">					&#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">&quot;remove&quot;</span>.equals(t.opType)) &#123;</span><br><span class="line">						pool.remove(t.player);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">				pool.match();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>还需要一个类负责处理任务，进行玩家间的匹配：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MatchPool</span> </span>&#123;</span><br><span class="line">	TreeSet&lt;Player&gt; players = <span class="keyword">new</span> TreeSet&lt;&gt;(Comparator.comparingInt(Player::getScore));</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(Player player)</span> </span>&#123;</span><br><span class="line">		log.info(<span class="string">&quot;pool add player...&quot;</span>);</span><br><span class="line">		players.add(player);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(Player player)</span> </span>&#123;</span><br><span class="line">		log.info(<span class="string">&quot;pool remove player...&quot;</span>);</span><br><span class="line">		players.removeIf(p -&gt; p.id == player.id);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">match</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (players.size() &lt; <span class="number">2</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">		Player player1 = players.pollFirst();</span><br><span class="line">		Player player2 = players.pollFirst();</span><br><span class="line">		<span class="keyword">assert</span> player1 != <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">assert</span> player2 != <span class="keyword">null</span>;</span><br><span class="line">		System.out.println(<span class="string">&quot;match &quot;</span> + player1.name + <span class="string">&quot; and &quot;</span> + player2.name);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样就基本完成了，同时启动客户端和远处的服务端，在Python客户端中输入，远程的Java服务进行处理后返回响应。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
     
 
 
@@ -1064,86 +1172,6 @@
 
 
 
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/21/CSAPP%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="小小KUN">
-      <meta itemprop="description" content="wake the fuck up, samurai">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="suTrue">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/09/21/CSAPP%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">CSAPP网络编程</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2019-09-21 11:32:24" itemprop="dateCreated datePublished" datetime="2019-09-21T11:32:24+08:00">2019-09-21</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="客户端-服务器编程模型"><a href="#客户端-服务器编程模型" class="headerlink" title="客户端-服务器编程模型"></a>客户端-服务器编程模型</h2><p>每个网络应用都是基于客户端-服务器模型的，服务器管理某种资源，客户端向其请求，服务器处理请求，再发送响应，客户端再处理响应。这就是一个<strong>事务</strong>（模型中的基本操作）。</p>
-<p>对一个主机而言，网络只是一种<strong>I/O设备</strong>。客户端和服务器通过在连接上发送和接受字节流来通信，这些字节流使用<strong>套接字接口函数和Unix I/O函数</strong>进行处理。</p>
-<p>一个套接字是连接的一个<strong>端点</strong>，每个套接字都有相应的<strong>套接字地址</strong>，由一个因特网地址和一个16位的整数端口组成。客户端中的地址的端口是由内核自动分配的，称为临时端口。服务器中的通常是某个知名的端口。</p>
-<p>一个连接是由它两端的套接字地址唯一确定的，这对套接字地址叫做<strong>套接字对</strong>（socket pair），表示为（cliaddr: cliport, servaddr: servport）</p>
-<p>IP地址结构是一个32位无符号整数，放在所谓的IP地址结构中：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span>&#123;</span></span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">int</span> s_addr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>IP地址总是以（大端法）网络字节顺序存放的，主机字节顺序是小端法，Unix提供了下面的转换函数：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> <span class="title">htonl</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> hostlong)</span></span>; <span class="comment">//将32位主机字节顺序转为网络字节顺序</span></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> <span class="title">htons</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> hostshort)</span></span>;  <span class="comment">//16位</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> <span class="title">ntohl</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> netlong)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> <span class="title">ntohs</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> netshort)</span></span>;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/09/21/CSAPP%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
 
   
   <nav class="pagination">
@@ -1188,7 +1216,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
